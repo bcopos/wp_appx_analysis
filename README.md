@@ -25,3 +25,20 @@ What else?
 
 - check if developers check `callingUri` in ScriptNotifyEvent handlers
 
+
+Code Example of handlers
+------
+
+`handleScriptNotifyEvents()` - it checks the calling Uri
+
+```
+webview.addEventListener("MSWebViewScriptNotify", handleScriptNotifyEvents);
+function handleScriptNotifyEvents(e) {
+        if (e.callingUri === "https://msgnotify.example.net/") {
+            if(e.value === "msg1")
+            {
+                // Process the message.);
+            }
+        }
+    }
+```
