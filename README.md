@@ -8,6 +8,7 @@ How?
 ----
 
 The analysis occurs in two steps:
+
 1. Unpack appx and inspect manifest file for compatibility
 	- check if application has WebView component
 	- check if application has ScriptNotifyEvent handlers
