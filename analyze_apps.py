@@ -2,8 +2,6 @@
 
 1. Find scriptNotify handlers (for both WebView and WebBrowser)
 2. Find methods called by handlers
-TODO:
-- check all of the above
 3. Filter methods by sensitive API
 	- define sensitive API
 4. Determine data dependencies between handler args and sensitive API function args
@@ -21,9 +19,10 @@ import subprocess
 apps_dir = "C:\\Users\\b\\Downloads\\apps"
 unzipped_apps_dir = "C:\\Users\\b\\Downloads\\apps\\unzipped"
 UNZIP = "C:\\Users\\b\\Downloads\\7za920\\7za.exe"
+OUTFILE = "output.txt"
 
 def main():
-	of = open('blah.txt', 'w')
+	of = open(OUTFILE, 'w')
 	of.write('')
 	of.close()
 
@@ -42,7 +41,7 @@ def main():
 			for f in os.listdir(os.path.join(unzipped_apps_dir, d)):
 				f_dir = os.path.join(unzipped_apps_dir, d)
 				if f.endswith('exe'):
-					of = open('blah.txt', 'a')
+					of = open(OUTFILE, 'a')
 					of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 					of.close()
 					
@@ -55,7 +54,7 @@ def main():
 					handlers = searchScriptNotifyHandler(asm)
 					
 					for handler in handlers:
-						of = open("blah.txt", "a")
+						of = open(OUTFILE, "a")
 						of.write("HANDLER: " + str(handler.Name) + "\n")
 						of.write("METHODS CALLED: \n")
 						of.close()
@@ -104,7 +103,7 @@ def getMethodsCalled(method):
 		if method.Body:
 			for i in method.Body.Instructions:
 				if "call" in i.OpCode.Name:
-					of = open("blah.txt", "a")
+					of = open(OUTFILE, "a")
 					of.write("\t" + str(i.Operand.Name) + "\n")
 					of.close()
 					getMethodsCalled(i.Operand.GetElementMethod())
@@ -112,13 +111,13 @@ def getMethodsCalled(method):
 def test():
 	# TEST USING WEBVIEW EXAMPLE
 	
-	of = open('blah.txt', 'w')
+	of = open(OUTFILE, 'w')
 	of.write('')
 	of.close()
 
 	f = "Controls_WebView.WindowsPhone.exe"
 	f_dir = "C:\\Users\\b\\Downloads\\XAML WebView control sample\\C#\\WindowsPhone\\bin\\Debug"
-	of = open('blah.txt', 'a')
+	of = open(OUTFILE, 'a')
 	of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 	of.close()
 					
@@ -129,7 +128,7 @@ def test():
 
 	searchScriptNotifyHandler(asm)
 	for handler in handlers:
-		of = open("blah.txt", "a")
+		of = open(OUTFILE, "a")
 		of.write("HANDLER: " + str(handler.Name) + "\n")
 		of.write("METHODS CALLED: \n")
 		of.close()
