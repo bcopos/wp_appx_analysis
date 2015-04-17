@@ -1,6 +1,9 @@
 Analysis Platform
 ============
 
+Identifying JS handlers and the methods called by the handler
+-------
+
 Steps:
 1. Gather all Types
 	-For every Type:
@@ -15,5 +18,41 @@ Steps:
 						- look for sensitive API functions called
 						- look for arguments (data tracking/taint)
 
+Data dependency
+------
+
+Objective:
+	Determine if data passed to a method (i.e. JS handler) flows into method call
 
 
+Steps:
+Given a method, X:
+1. find any method calls inside X 
+	e.g. X calls method a and method b
+2. record number of parameters required by method called
+	e.g. num parameters to method a()
+3. record if method called returns a value 
+	e.g. does method a() return anything, if yes, mark as tainted
+	- values returned by method is automatically pushed on the stack at the end of the call instruction
+4. walk backwards from the method call instruction to see if data pushed onto stack is argument of method X
+	- before a method call, data is pushed onto the stack which represent the arguments to the method
+	- if the data pushed onto the stack, before call to method a(), is an argument of method X, the assembly will look like:
+		ldarg.0
+		call method_a
+	- if the data pushed onto the stack, before the call to method a(), is a local variable of method X, the assembly will look like:
+		ldloc
+		call method_a
+
+Structures needed:
+- counter for number of arguments to a method call
+- structure holding "tainted" data
+
+Issues:
+- unknown functions:
+	e.g. 
+	foo(a ,b) {
+		c = lib_func(a)
+	}
+	- Do we mark c as tainted?
+
+- 
