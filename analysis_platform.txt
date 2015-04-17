@@ -1,0 +1,19 @@
+Analysis Platform
+============
+
+Steps:
+1. Gather all Types
+	-For every Type:
+		- Get all Methods
+			- check for presence of JavaScript interface
+				- e.g.: myWebView.ScriptNotify += some_func_here;
+					- find ScriptNotify
+				- if not:
+					- stop
+				- else:
+					- get all methods called by that function
+						- look for sensitive API functions called
+						- look for arguments (data tracking/taint)
+
+
+
