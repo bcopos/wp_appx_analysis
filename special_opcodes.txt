@@ -1,0 +1,1 @@
+["add", "call", "box", "castclass", "cqe", "cgt", "ckfinite", "clt", "conv", "div", "dup", "isinst", "localloc", "mkrefany", "mul", "neg", "newarr", "newobj", "not", "or", "refanytype", "refanyval", "rem", "ret", "shl", "shr", "sub", "unbox", "xor" ]

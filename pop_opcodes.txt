@@ -1,0 +1,14 @@
+["pop", "stloc", "stobj", "stfld", "stelem", "starg", "stind", "stsfld", "beq", "bge", "bgt", "ble", "blt", "bne", "brfalse", "brtrue", "cpblk", "cpobj", "endfilter", "initblk", "initobj", "switch", "tail", "throw"]
+
+Branch
+beq = transfers control to a target instruction if two values are equal
+bge = transfers control to a target instruction if the first value is greater than or equal to the second value
+bgt = 
+ble = 
+blt = 
+bne =
+
+cpblk = pops 3 off stack
+cpobj = pops 2 off stack
+initblk = pops 3 off stack
+initobj = pops 1 off stack
