@@ -2,6 +2,8 @@
 
 1. Find scriptNotify handlers (for both WebView and WebBrowser)
 2. Find methods called by handlers
+TODO:
+- check all of the above
 3. Filter methods by sensitive API
 	- define sensitive API
 4. Determine data dependencies between handler args and sensitive API function args
@@ -19,10 +21,9 @@ import subprocess
 apps_dir = "C:\\Users\\b\\Downloads\\apps"
 unzipped_apps_dir = "C:\\Users\\b\\Downloads\\apps\\unzipped"
 UNZIP = "C:\\Users\\b\\Downloads\\7za920\\7za.exe"
-OUTFILE = "output.txt"
 
 def main():
-	of = open(OUTFILE, 'w')
+	of = open('blah.txt', 'w')
 	of.write('')
 	of.close()
 
@@ -41,7 +42,7 @@ def main():
 			for f in os.listdir(os.path.join(unzipped_apps_dir, d)):
 				f_dir = os.path.join(unzipped_apps_dir, d)
 				if f.endswith('exe'):
-					of = open(OUTFILE, 'a')
+					of = open('blah.txt', 'a')
 					of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 					of.close()
 					
@@ -54,7 +55,7 @@ def main():
 					handlers = searchScriptNotifyHandler(asm)
 					
 					for handler in handlers:
-						of = open(OUTFILE, "a")
+						of = open("blah.txt", "a")
 						of.write("HANDLER: " + str(handler.Name) + "\n")
 						of.write("METHODS CALLED: \n")
 						of.close()
@@ -103,21 +104,65 @@ def getMethodsCalled(method):
 		if method.Body:
 			for i in method.Body.Instructions:
 				if "call" in i.OpCode.Name:
-					of = open(OUTFILE, "a")
+					of = open("blah.txt", "a")
 					of.write("\t" + str(i.Operand.Name) + "\n")
 					of.close()
 					getMethodsCalled(i.Operand.GetElementMethod())
-					
+
+'''
+	Returns number of parameters for a given method
+'''
+def getMethodParamCount(method):
+	return method.Parameters.Count
+
+'''
+	Traces data from current method's parameters to the parameters of a method called within
+	
+	e.g. foo(int x, int y) { bar(x) }  # traces foo's param x to argument of bar() func
+	
+	instructions opcodes used to push data onto stack:
+	- ldarg
+	- ldc
+		Loads constant
+	- ldfld
+		Finds the value of a field in the object whose reference is currently on the evaluation stack
+	- 
+'''
+PUSH_INS = [ "ldarg", "ldc", ]
+POP_INS = []
+def traceParamsToArgs(method)
+{
+	fstack = []
+	# remember to ignore ctor methods
+	if method.Body:
+		tainted_return = False
+		for ins in method.Body.Instructions:
+			if ins.OpCode in PUSH_INS:
+				data = '' 
+				fstack.append({'data': data, 'tainted': tainted})
+			if ins.OpCode in POP_INS:
+				data = fstack.pop()
+				if data['tainted']:
+					tainted_return = True
+				# does ins also PUSH return value onto stack
+				#	# push the return value
+				#	fstack.append({'data': data, 'tainted': tainted_return})
+				#	tainted_return = False	
+			if ins.OpCode in JMP_INS:
+				print "JMP ins, cannot handle"
+				break
+}
+	
 def test():
 	# TEST USING WEBVIEW EXAMPLE
 	
-	of = open(OUTFILE, 'w')
+	of = open('blah.txt', 'w')
 	of.write('')
 	of.close()
 
 	f = "Controls_WebView.WindowsPhone.exe"
 	f_dir = "C:\\Users\\b\\Downloads\\XAML WebView control sample\\C#\\WindowsPhone\\bin\\Debug"
-	of = open(OUTFILE, 'a')
+	of = open('blah.txt', 'a')
 	of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 	of.close()
 					
@@ -128,7 +173,7 @@ def test():
 
 	searchScriptNotifyHandler(asm)
 	for handler in handlers:
-		of = open(OUTFILE, "a")
+		of = open("blah.txt", "a")
 		of.write("HANDLER: " + str(handler.Name) + "\n")
 		of.write("METHODS CALLED: \n")
 		of.close()

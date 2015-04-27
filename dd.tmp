@@ -1,0 +1,9 @@
+read instruction
+	if pop ins:
+		determine:
+			- arg_count
+			- pop X arg_count
+				- if data popped is tainted, mark return value as tainted
+	if push ins:
+		push data onto stack
+push or pop off the stack
