@@ -16,7 +16,10 @@ from Mono.Cecil import *
 import sys
 sys.path.append("C:\Program Files (x86)\IronPython 2.7\Lib")
 import os
+import string
+import random
 import subprocess
+import StackElement
 
 apps_dir = "C:\\Users\\b\\Downloads\\apps"
 unzipped_apps_dir = "C:\\Users\\b\\Downloads\\apps\\unzipped"
@@ -136,94 +139,79 @@ POP_INS = ["pop", "stloc", "stobj", "stfld", "stelem", "starg", "stind", "stsfld
 BRANCH_INS = ["beq", "bge", "bgt", "ble", "blt", "bne", "brfalse", "brtrue"]
 SWITCH_INS = ["switch"]
 
+
+#TODO:
+#
+# for any store instructions, store even if the value is not tained (in case we need it later)
+# if it is an 'object' store under memory['object']
+# if it is an 'array' store under memory['array']
+# etc
+#
+# what to store?
+# 	a tuple {data: X, tainted: T/F}
+#		where data (i.e. X) is:
+#			- random identifier, do we even need this?
+# 		and tainted describes if data from the argument could have flown into the data (directly or indirectly)
 def pop(method, ins, ins_index, fstack, memory):
 	if "starg" in ins.OpCode.ToString():
 		value = fstack.pop()
 		
-		if value["tainted"]:
-			argslot = value["data"].split('.')[1]
-			try:
-				argslots = memory["argslot"]
-				if not argslot in argslots:
-					argslots.append(argslot)
-			except KeyError:
-				memory.append({"argslot": [argslot]})
+		argslot = ins.OpCode.ToString().split('.')[1]
+	
+		memory["arg"+str(argslot)] = value
 
 	elif "stelem" in ins.OpCode.ToString():
 		value = fstack.pop()
 		index = fstack.pop()
-		arr_ref = fstack.pop()
-		
-		# mark entire array "tainted"
-		if value["tainted"]:
+		addr = fstack.pop()
+	
+		if value.isTainted():
 			try:
-				arrays = memory["array"]
-				if not arr_ref in arrays:
-					arrays.append(arr_ref)
+				memory[addr['data']].markTainted()	
 			except KeyError:
-				memory.append({"array": [arr_ref]})
-		
+				memory[addr['data']] = value	
+
 	elif "stfld" in ins.OpCode.ToString():
 		value = fstack.pop()
-		obj_ref = fstack.pop()
-		
-		if value["tainted"]:
+		# TODO: get actual obj_ref from stack element 
+		addr = fstack.pop()
+
+		if value.isTainted():	
 			try:
-				objects = memory["object"]
-				if not obj_ref in objects:
-					objects.append(obj_ref)
+				memory[addr['data']].markTainted()	
 			except KeyError:
-				memory.append({"object": [obj_ref]})
+				memory[addr['data']] = value	
 		
 	elif "stind" in ins.OpCode.ToString():
+		# pop
 		value = fstack.pop()
+		# pop address
 		address = fstack.pop()
 		
-		if value["tainted"]:
-			try:
-				addresses = memory["address"]
-				if not address in addresses:
-					addresses.append(address)
-			except KeyError:
-				memory.append({"address": [address]})
+		memory[addr['data']] = value
 		
 	elif "stloc" in ins.OpCode.ToString():
-		value = fstack.pop()
+		# pop stack
+		se = fstack.pop()
+	
 		# index comes after . (e.g. stloc.0)
 		index = value["data"].split('.')[1]
 		
-		if value["tainted"]:
-			try:
-				vars = memory["variable"]
-				if not index in vars:
-					vars.append(index)
-			except KeyError:
-				memory.append({"variable": [index]})
+		memory["loc"+str(index)] = value
 				
 	elif "stobj" in ins.OpCode.ToString():
-		obj = fstack.pop()
-		add = fstack.pop()
+		# pop object ref
+		obj_ref = fstack.pop()
+		# pop address
+		addr = fstack.pop()
 		
-		if value["tainted"]:
-			try:
-				objects = memory["object"]
-				if not obj in objects:
-					objects.append(obj)
-			except KeyError:
-				memory.append({"object": [obj]})
-		
+		memory[addr['data']] = obj_ref
 		
 	elif "stsfld" in ins.OpCode.ToString():
 		value = fstack.pop()
 		
-		if value["tainted"]:
-			field = value["data"].split('.')[1]
-			try:
-				fields = memory["field"]
-				if not field in fields:
-					fields.append(field)
-			except KeyError:
-				memory.append({"field": [field]})
+		field = ins.ToString.split(' ')[2]
+		memory[field] = value
 	
 	elif "initblk" in ins.OpCode.ToString():
 		num_bytes = fstack.pop()
@@ -240,10 +228,22 @@ def pop(method, ins, ins_index, fstack, memory):
 		obj_ref = fstack.pop()
 
 	elif "pop" in ins.OpCode.ToString():
-		fstack.pop()	
-	#TODO:	
-	#elif "cpblk" in ins.OpCode.ToString():
-	#elif "cpobj" in ins.OpCode.ToString():
+		fstack.pop()
+
+	elif "cpblk" in ins.OpCode.ToString():
+		num_bytes = fstack.pop()
+		src_addr = fstack.pop()
+		dst_addr = fstack.pop()
+		
+		memory[dst_addr['data']] = memory[src_addr['data']]
+
+	elif "cpobj" in ins.OpCode.ToString():
+		src_obj = fstack.pop()
+		dst_obj = fstack.pop()
+		
+		# check if src addr is tainted
+		memory[dst_obj['data']] = memory[src_obj['data']]
+
 	else:
 		print "Not handling ins " + ins.ToString()
 		
@@ -264,6 +264,41 @@ def branch(method, ins, ins_index, fstack, memory):
 		end_of_branch = findInsOfInterest(method, ins_index, "target")
 		dataFlow(method, fstack, end_of_branch, memory)
 		
+def newIns(method, ins, ins_index, fstack, memory):
+	if "newobj" in ins.OpCode.ToString():
+		# find how many arguments
+		num_args = ins.Operand.Parameters.Count 
+		# pop X arguments
+		tainted = False
+		for arg in range(0, num_args):
+			value = fstack.pop()
+			if value['tainted']:
+				tainted = True
+
+		# store in simulated memory
+		data = generateRandomAddress()
+		se = StackElement(data, tainted)
+		memory[data] = se
+		
+		# push reference (StackElement) onto stack
+		fstack.append(se)
+
+	elif "newarr" in ins.OpCode.ToString():
+		num_elements = fstack.pop()
+		
+		# store in simulated memory
+		data = generateRandomAddress()
+		se = StackElement(data, False)
+		memory[data] = se
+
+		# push reference onto stack
+		fstack.append(se}
+
+	else:
+		print "Not handling ins " + ins.ToString()
+
+def generateRandomAddress():
+	return ''.join(random.choice(string.ascii_uppercase[0:6] + string.digits) for _ in range(10))
 
 # e.g. findInsOfInterest(method, cur_index, "ret") finds the next return ins from the current index
 def findInsOfInterest(method, cur_index, target):
@@ -278,23 +313,15 @@ def findInsOfInterest(method, cur_index, target):
 def dataFlow(method, fstack, ins_index, memory):
 	cur_ins = method.Body.Instructions[ins_index]
 	
-	opcode = cur_ins.OpCode
+	opcode = cur_ins.OpCode.ToString()
 	if opcode in PUSH_INS:
 		tainted = False
 		if "ldarg" in opcode.ToString():
 			tainted = True
 		fstack.append({'data': ins.ToString(), 'tainted': tainted})
-	if opcode in POP_INS:
-		if "st" in opcode.ToString():
-			store(cur_ins, fstack, memory)
-		else:
-			#how many pop ops
-			num_pop = 
-			# perform pop
-			for i in range(0, num_pop):
-				if len(fstack) != 0:
-					fstack.pop()
-	if opcode in SPECIAL_INS:
+	elif opcode in POP_INS:
+		pop(method, cur_ins, ins_index, fstack, memory)
+	elif opcode in SPECIAL_INS:
 		
 
 def traceParamsToArgs(method):
