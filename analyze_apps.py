@@ -251,13 +251,17 @@ def load(method, ins, ins_index, fstack, memory):
 	print "stuff goes here.."
 
 def branch(method, ins, ins_index, fstack, memory):
-	# for branch ins, split execution one contiunuing with branch and another contiuning from the next "ret" ins (end of branch)
+	# for branch ins, split execution one contiunuing with branch and another contiuning from the next target ins (end of branch)
 	if ins.OpCode.ToString() in BRANCH_INS:
 		value1 = fstack.pop()
 		value2 = fstack.pop()
 
+		target = ins.ToString().split(' ')[2]
+		if "IL" not in target:
+			print "messed up split"
+
 		# split execution
-		end_of_branch = findInsOfInterest(method, ins_index, "ret")
+		end_of_branch = findInsOfInterest(method, ins_index, "target")
 		dataFlow(method, fstack, end_of_branch, memory)
 		
 
@@ -267,7 +271,7 @@ def findInsOfInterest(method, cur_index, target):
 	while ins.Next:
 		ins = ins.Next
 		cur_index += 1
-		if target in ins.OpCode.ToString():
+		if target in ins.ToString():
 			return cur_index
 	return 0
 		
