@@ -217,9 +217,13 @@ def pop(method, ins, ins_index, fstack, memory):
 		num_bytes = fstack.pop()
 		init_val = fstack.pop()
 		address = fstack.pop()
+
+		memory[address['data']] = init_val
 	
 	elif "initobj" in ins.OpCode.ToString():
-		value = fstack.pop()
+		address = fstack.pop()
+		
+		memory[address['data']] = StackElement("", False)
 
 	elif "endfilter" in ins.OpCode.ToString():
 		value = fstack.pop()
@@ -277,10 +281,11 @@ def newIns(method, ins, ins_index, fstack, memory):
 
 		# store in simulated memory
 		data = generateRandomAddress()
-		se = StackElement(data, tainted)
+		se = StackElement("", tainted)
 		memory[data] = se
 		
 		# push reference (StackElement) onto stack
+		se = StackElement(data, tainted)
 		fstack.append(se)
 
 	elif "newarr" in ins.OpCode.ToString():
@@ -288,10 +293,11 @@ def newIns(method, ins, ins_index, fstack, memory):
 		
 		# store in simulated memory
 		data = generateRandomAddress()
-		se = StackElement(data, False)
+		se = StackElement("", False)
 		memory[data] = se
 
 		# push reference onto stack
+		se = StackElement(data, False)
 		fstack.append(se}
 
 	else:
