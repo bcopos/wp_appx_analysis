@@ -134,33 +134,161 @@ def getMethodParamCount(method):
 	
 '''
 #TODO: PUSH_INS, SWITCH
-PUSH_INS = ["ldarg", "ldc", ]
+PUSH_INS = ["ldarg", "ldc", "ldelem", "ldfld", "ldftn", "ldind", "ldlen", "ldloc", "ldnull", "ldobj", "ldsfld", "ldstr", "ldtoken", "ldvirtfn"]
 POP_INS = ["pop", "stloc", "stobj", "stfld", "stelem", "starg", "stind", "stsfld", "cpblk", "cpobj", "endfilter", "initblk", "initobj", "throw"]
 BRANCH_INS = ["beq", "bge", "bgt", "ble", "blt", "bne", "brfalse", "brtrue"]
 SWITCH_INS = ["switch"]
+BREAK_INS = ["break"]
 
+def push(method, ins, ins_index, fstack, memory):
+	if ins.OpCode in [ Mono.Cecil.Cil.OpCodes.Ldarg_0, Mono.Cecil.Cil.OpCodes.Ldarg_1, Mono.Cecil.Cil.OpCodes.Ldarg_2, Mono.Cecil.Cil.OpCodes.Ldarg_3, Mono.Cecil.Cil.OpCodes.Ldarg_S, Mono.Cecil.Cil.OpCodes.Ldarga_S ]:
+		argslot = ins.OpCode.ToString().split('.')[1]
+		se = StackElement("arg"+argslot, True)
+		
+		# push onto stack
+		fstack.append(se)
+		
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Ldc_I4_M1, Mono.Cecil.Cil.Opcodes.Ldc_I4_0, Mono.Cecil.Cil.Opcodes.Ldc_I4_1, Mono.Cecil.Cil.Opcodes.Ldc_I4_2, Mono.Cecil.Cil.Opcodes.Ldc_I4_3, Mono.Cecil.Cil.Opcodes.Ldc_I4_4, Mono.Cecil.Cil.Opcodes.Ldc_I4_5, Mono.Cecil.Cil.Opcodes.Ldc_I4_6, Mono.Cecil.Cil.Opcodes.Ldc_I4_7, Mono.Cecil.Cil.Opcodes.Ldc_I4_8, Mono.Cecil.Cil.Opcodes.Ldc_I4_S, Mono.Cecil.Cil.Opcodes.Ldc_I4, Mono.Cecil.Cil.Opcodes.Ldc_R4, Mono.Cecil.Cil.Opcodes.Ldc_R8 ]:
+		if ins.Operand:
+			value = ins.Operand.ToString()
+		else:
+			value = ins.OpCode.ToString().split('.')[2]
 
-#TODO:
+		# create stack element
+		se = StackElement(value, False)
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Ldelema, Mono.Cecil.Cil.Opcodes.Ldelem_I1, Mono.Cecil.Cil.Opcodes.Ldelem_U1, Mono.Cecil.Cil.Opcodes.Ldelem_I2, Mono.Cecil.Cil.Opcodes.Ldelem_U2, Mono.Cecil.Cil.Opcodes.Ldelem_I4, Mono.Cecil.Cil.Opcodes.Ldelem_U4, Mono.Cecil.Cil.Opcodes.Ldelem_I8, Mono.Cecil.Cil.Opcodes.Ldelem_I, Mono.Cecil.Cil.Opcodes.Ldelem_R4, Mono.Cecil.Cil.Opcodes.Ldelem_R8, Mono.Cecil.Cil.Opcodes.Ldelem_Ref ]:
+		# pop
+		index = fstack.pop()
+		array_ref = fstack.pop()
+
+		#TODO: does this really matter? we just care if it's tainted...
+		value = ""
+		se = StackElement(value, array_ref.isTainted())
+		
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode in [ Mono.Cecil.Cil.Opcodes.Ldfld, Mono.Cecil.Cil.Opcodes.Ldflda ]:
+	 	# pop
+		obj_ref = fstack.pop()
+
+		se = StackElement("", obj_ref.isTainted())		
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Ldind_I1, Mono.Cecil.Cil.Opcodes.Ldind_U1, Mono.Cecil.Cil.Opcodes.Ldind_I2, Mono.Cecil.Cil.Opcodes.Ldind_U2, Mono.Cecil.Cil.Opcodes.Ldind_I4, Mono.Cecil.Cil.Opcodes.Ldind_U4, Mono.Cecil.Cil.Opcodes.Ldind_I8, Mono.Cecil.Cil.Opcodes.Ldind_I, Mono.Cecil.Cil.Opcodes.Ldind_R4, Mono.Cecil.Cil.Opcodes.Ldind_R8, Mono.Cecil.Cil.Opcodes.Ldind_Ref ]:
+	 	# pop
+		addr = fstack.pop()
+
+		se = StackElement("", memory[addr['data']].isTainted())
+	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldlen:
+		# pop
+		array_ref = fstack.pop()
+
+		se = StackElement("", False)	 	
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode in [ Mono.Cecil.Cil.Opcodes.Ldloc, Mono.Cecil.Cil.Opcodes.Ldloca, Mono.Cecil.Cil.Opcodes.Ldloc_S, Mono.Cecil.Cil.Opcodes.Ldloca_S ]:
+		if ins.Operand:
+			loc = ins.Operand.ToString()
+		else:
+			loc = ins.OpCode.ToString().split('.')[1]
+
+		se = memory[loc] 
+	 	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldnull:
+		se = StackElement("null", False)
+	 	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldobj:
+		# pop
+		addr = fstack.pop()
+
+		se = memory[addr['data']]
+	 	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode in [ Mono.Cecil.Cil.Opcodes.Ldsfld, Mono.Cecil.Cil.Opcodes.Ldsflda ]:
+	 	# TODO
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldstr:
+		se = StackElement("", False)
+	 	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldtoken:
+		se = StackElement("", False)
+	 	
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Ldvirtftn:
+		# pop
+		fstack.pop()
+
+		se = StackElement("", False)
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Sizeof:
+		se = StackElement("", False)
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Volatile:
+
+		# push onto stack
+		fstack.append(se)
+
+	elif ins.Opcode == Mono.Cecil.Cil.Opcodes.Unaligned:
+
+		# push onto stack
+		fstack.append(se)
+
+	else:
+		print "Not handling ins " + ins.ToString()
+			
+
 #
 # for any store instructions, store even if the value is not tained (in case we need it later)
-# if it is an 'object' store under memory['object']
-# if it is an 'array' store under memory['array']
-# etc
 #
 # what to store?
-# 	a tuple {data: X, tainted: T/F}
+#	a StackElement (data, tainted bool)
 #		where data (i.e. X) is:
-#			- random identifier, do we even need this?
+#			- usually empty or something bogus
+#			- if it is a memory reference (array ref or obj ref etc) then it's the address
 # 		and tainted describes if data from the argument could have flown into the data (directly or indirectly)
 def pop(method, ins, ins_index, fstack, memory):
-	if "starg" in ins.OpCode.ToString():
+	if ins.OpCode == Mono.Cecil.Cil.OpCodes.Starg or ins.OpCode == Mono.Cecil.Cil.OpCodes.Starg_S:
 		value = fstack.pop()
 		
 		argslot = ins.OpCode.ToString().split('.')[1]
 	
 		memory["arg"+str(argslot)] = value
 
-	elif "stelem" in ins.OpCode.ToString():
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Stelem_I, Mono.Cecil.Cil.Opcodes.Stelem_I1, Mono.Cecil.Cil.Opcodes.Stelem_I2, Mono.Cecil.Cil.Opcodes.Stelem_I4, Mono.Cecil.Cil.Opcodes.Stelem_I8, Mono.Cecil.Cil.Opcodes.Stelem_R4, Mono.Cecil.Cil.Opcodes.Stelem_R8, Mono.Cecil.Cil.Opcodes.Stelem_Ref, Mono.Cecil.Cil.Opcodes.Stelem_Any ]:
 		value = fstack.pop()
 		index = fstack.pop()
 		addr = fstack.pop()
@@ -171,7 +299,7 @@ def pop(method, ins, ins_index, fstack, memory):
 			except KeyError:
 				memory[addr['data']] = value	
 
-	elif "stfld" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Stfld:
 		value = fstack.pop()
 		# TODO: get actual obj_ref from stack element 
 		addr = fstack.pop()
@@ -182,7 +310,7 @@ def pop(method, ins, ins_index, fstack, memory):
 			except KeyError:
 				memory[addr['data']] = value	
 		
-	elif "stind" in ins.OpCode.ToString():
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Stind_Ref, Mono.Cecil.Cil.Opcodes.Stind_I1, Mono.Cecil.Cil.Opcodes.Stind_I2, Mono.Cecil.Cil.Opcodes.Stind_I4, Mono.Cecil.Cil.Opcodes.Stind_I8, Mono.Cecil.Cil.Opcodes.Stind_R4, Mono.Cecil.Cil.Opcodes.Stind_R8, Mono.Cecil.Cil.Opcodes.Stind_I ]:
 		# pop
 		value = fstack.pop()
 		# pop address
@@ -190,7 +318,7 @@ def pop(method, ins, ins_index, fstack, memory):
 		
 		memory[addr['data']] = value
 		
-	elif "stloc" in ins.OpCode.ToString():
+	elif ins.OpCode in [ Mono.Cecil.Cil.Opcodes.Stloc, Mono.Cecil.Cil.Opcodes.Stloc_0, Mono.Cecil.Cil.Opcodes.Stloc_1, Mono.Cecil.Cil.Opcodes.Stloc_2, Mono.Cecil.Cil.Opcodes.Stloc_3, Mono.Cecil.Cil.Opcodes.Stloc_S ]:
 		# pop stack
 		se = fstack.pop()
 	
@@ -199,7 +327,7 @@ def pop(method, ins, ins_index, fstack, memory):
 		
 		memory["loc"+str(index)] = value
 				
-	elif "stobj" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Stobj:
 		# pop object ref
 		obj_ref = fstack.pop()
 		# pop address
@@ -207,41 +335,41 @@ def pop(method, ins, ins_index, fstack, memory):
 		
 		memory[addr['data']] = obj_ref
 		
-	elif "stsfld" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Stsfld:
 		value = fstack.pop()
 		
 		field = ins.ToString.split(' ')[2]
 		memory[field] = value
 	
-	elif "initblk" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Initblk:
 		num_bytes = fstack.pop()
 		init_val = fstack.pop()
 		address = fstack.pop()
 
 		memory[address['data']] = init_val
 	
-	elif "initobj" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Initobj:
 		address = fstack.pop()
 		
 		memory[address['data']] = StackElement("", False)
 
-	elif "endfilter" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Endfilter:
 		value = fstack.pop()
 
-	elif "throw" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Throw:
 		obj_ref = fstack.pop()
 
-	elif "pop" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Pop:
 		fstack.pop()
 
-	elif "cpblk" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Cpblk:
 		num_bytes = fstack.pop()
 		src_addr = fstack.pop()
 		dst_addr = fstack.pop()
 		
 		memory[dst_addr['data']] = memory[src_addr['data']]
 
-	elif "cpobj" in ins.OpCode.ToString():
+	elif ins.OpCode == Mono.Cecil.Cil.Opcodes.Cpobj:
 		src_obj = fstack.pop()
 		dst_obj = fstack.pop()
 		
@@ -251,9 +379,6 @@ def pop(method, ins, ins_index, fstack, memory):
 	else:
 		print "Not handling ins " + ins.ToString()
 		
-def load(method, ins, ins_index, fstack, memory):
-	print "stuff goes here.."
-
 def branch(method, ins, ins_index, fstack, memory):
 	# for branch ins, split execution one contiunuing with branch and another contiuning from the next target ins (end of branch)
 	if ins.OpCode.ToString() in BRANCH_INS:
@@ -319,16 +444,25 @@ def findInsOfInterest(method, cur_index, target):
 def dataFlow(method, fstack, ins_index, memory):
 	cur_ins = method.Body.Instructions[ins_index]
 	
-	opcode = cur_ins.OpCode.ToString()
-	if opcode in PUSH_INS:
-		tainted = False
-		if "ldarg" in opcode.ToString():
-			tainted = True
-		fstack.append({'data': ins.ToString(), 'tainted': tainted})
-	elif opcode in POP_INS:
-		pop(method, cur_ins, ins_index, fstack, memory)
-	elif opcode in SPECIAL_INS:
+	while True
+		opcode = cur_ins.OpCode.ToString()
+		if opcode in PUSH_INS:
+			tainted = False
+			if "ldarg" in opcode.ToString():
+				tainted = True
+			fstack.append({'data': ins.ToString(), 'tainted': tainted})
+		elif opcode in POP_INS:
+			pop(method, cur_ins, ins_index, fstack, memory)
+		elif opcode in SPECIAL_INS:
 		
+		elif opcode in BRANCH_INS:
+			branch(method, ins, ins_index, fstack, memory):
+		else:
+			print "Don't recognize ins: " + cur_ins.ToString()
+	
+		cur_ins = cur_ins.Next
+		if not cur_ins:
+			break
 
 def traceParamsToArgs(method):
 	fstack = []
