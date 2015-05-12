@@ -76,7 +76,7 @@ The collected applications were used to test our analysis tool.
 Previous works which have studied security of data in smartphone platforms analyze applications can split into two categories.
 One category assumes a careless or perhaps even malicious application developer.
 In such cases, sensitive data extracted by the application using permissions to device resources is leaked off of the device via SMS, MMS or any other method for transmitting data externally.
-The work of William Enck et. al. presented in “TaintDroid: An Information-Flow Tracking System for Realtime Privacy Monitoring on Smartphones” falls under this category.
+The work of William Enck et. al. presented in “TaintDroid: An Information-Flow Tracking System for Realtime Privacy Monitoring on Smartphones” \cite{enck2014taintdroid} falls under this category.
 As part of their work, they developed a taint-tracking system for Android applications.
 The taint-tracking system works by tracing data through the application during execution.
 Specifically, the application’s sources and sinks are specified.
@@ -94,7 +94,7 @@ The results showed that two thirds of the applications studied display suspiciou
 Moreover, the findings show that half of the applications studied released sensitive data such as GPS location to third-party advertising companies through advertisement libraries.
 
 The second category assumes a benign application which is attacked by third party code, either through Javascript or inter-process communication.
-Example of works in this category are Luo et. al.’s “Attacks on WebView in the Android” and “Bifocals: Analyzing WebView Vulnerabilities in Android Applications” where Erika Chin et. al. presented a tool for examining Android applications and their WebView component.
+Example of works in this category are Luo et. al.’s “Attacks on WebView in the Android” \cite{luo2011attacks} and “Bifocals: Analyzing WebView Vulnerabilities in Android Applications”  \cite{chin2014bifocals} where Erika Chin et. al. presented a tool for examining Android applications and their WebView component.
 Specifically, the Bifocals tool detected vulnerabilities to excess authorization attacks and file-based cross-zone scripting attacks.
 Excess authorization attacks are attacks where malicious Javascript can invoke application code (via Javascript interfaces).
 When a WebView enables JavaScript, registers a JavaScript interface, JavaScript content in the WebView can invoke the registered interfaces.
@@ -163,6 +163,9 @@ The conclusion goes here.
 
 \section*{Acknowledgment}
 The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor Professor Matt Bishop.
+
+\bibliographystyle{abbrv}
+\bibliography{ecs289_windowsphone}
 
 \end{document}
 

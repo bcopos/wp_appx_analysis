@@ -1,0 +1,22 @@
+\begin{thebibliography}{1}
+
+\bibitem{chin2014bifocals}
+E.~Chin and D.~Wagner.
+\newblock Bifocals: Analyzing webview vulnerabilities in android applications.
+\newblock In {\em Information Security Applications}, pages 138--159. Springer,
+  2014.
+
+\bibitem{enck2014taintdroid}
+W.~Enck, P.~Gilbert, S.~Han, V.~Tendulkar, B.-G. Chun, L.~P. Cox, J.~Jung,
+  P.~McDaniel, and A.~N. Sheth.
+\newblock Taintdroid: an information-flow tracking system for realtime privacy
+  monitoring on smartphones.
+\newblock {\em ACM Transactions on Computer Systems (TOCS)}, 32(2):5, 2014.
+
+\bibitem{luo2011attacks}
+T.~Luo, H.~Hao, W.~Du, Y.~Wang, and H.~Yin.
+\newblock Attacks on webview in the android system.
+\newblock In {\em Proceedings of the 27th Annual Computer Security Applications
+  Conference}, pages 343--352. ACM, 2011.
+
+\end{thebibliography}
