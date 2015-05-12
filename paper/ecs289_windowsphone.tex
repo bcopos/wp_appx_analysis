@@ -196,6 +196,13 @@ Although it could be more dangerous and detrimental if the handlers executed a s
 % - presumably developers will write applications in html and js directly for easy portability to other platforms (using Apache Cordova or Phonegap). in such cases no webview is needed, lowering the number of applications which meet the prerequisites of our analysis
 % - data flow challenges, dealing with bytecode instructions, needing to know what the opcodes mean and how they affect the execution, especially the stack
 
+\section{Future Work}
+
+While our analysis tools focuses on Javascript handlers, we believe the data flow analysis can also be applied to investigate over-privileged applications which leak sensitive information.
+In the future, we would like to extend our framework to also search for such applications.
+
+Additionally, we would like to change our data flow analysis from intra-procedural to inter-procedural for more accurate analysis.
+
 \section{Conclusion}
 The conclusion goes here.
 
