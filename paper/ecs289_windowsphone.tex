@@ -112,7 +112,12 @@ For example, one main difference between the two platforms involves their permis
 However, the presence of the WebVIew component does not imply the underlying implementation and security mechanisms are identical.
 From our literature search, no previous work has investigated the above listed attack vectors on the Windows Phone 8.1 platform.
 
-[talk about Windows Phone platform and applications]
+The Windows Phone platform allows applications to be written in a number of languages, including C\#, Visual Basic, and even HTML and Javascript.
+Before being published to the application store, the phones are packaged.
+The format of the package depends on the target version.
+Applications targeting Windows Phone 8 and above, will use the new package format, \textit{appx}.
+This format resembles the \textit{zip} format and unlike the old application package format \textit{xap}, the application packages are not encrypted and can easily be unpackaged.
+An application package will include the application binary, in MSIL/CIL format, any supporting libraries, necessary media files, as well as manifest files describing the application and its properties such as the required capabilities, prerequisites, resources and even visual elements (similar to activities in the Android platform).
 
 \section{Methodology}
 
@@ -147,6 +152,10 @@ Furthermore, out of the 4 applications, [NUMBER] applications check the ``callin
 Although it could be more dangerous and detrimental if the handlers executed a sensitive API, not verifying the ``calling URI" is considered bad practice.
 
 \section{Challenges}
+
+% - allowing applications to be written in multiple languages makes analysis difficult
+% - presumably developers will write applications in html and js directly for easy portability to other platforms (using Apache Cordova or Phonegap). in such cases no webview is needed, lowering the number of applications which meet the prerequisites of our analysis
+% - data flow challenges, dealing with bytecode instructions, needing to know what the opcodes mean and how they affect the execution, especially the stack
 
 \section{Conclusion}
 The conclusion goes here.
