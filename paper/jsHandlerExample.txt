@@ -1,0 +1,10 @@
+webview.addEventListener("MSWebViewScriptNotify", handleScriptNotifyEvents);
+function handleScriptNotifyEvents(e) {
+        if (e.callingUri === "https://msgnotify.example.net/") {
+            if(e.value === "msg1")
+            {
+                // Process the message.);
+            }
+        }
+    }
+

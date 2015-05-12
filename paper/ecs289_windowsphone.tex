@@ -1,27 +1,9 @@
 \documentclass[conference]{IEEEtran}
 
 \usepackage{cite}
-
-% *** SPECIALIZED LIST PACKAGES ***
-%
-%\usepackage{algorithmic}
-% algorithmic.sty was written by Peter Williams and Rogerio Brito.
-% This package provides an algorithmic environment fo describing algorithms.
-% You can use the algorithmic environment in-text or within a figure
-% environment to provide for a floating algorithm. Do NOT use the algorithm
-% floating environment provided by algorithm.sty (by the same authors) or
-% algorithm2e.sty (by Christophe Fiorio) as IEEE does not use dedicated
-% algorithm float types and packages that provide these will not provide
-% correct IEEE style captions. The latest version and documentation of
-% algorithmic.sty can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithms/
-% There is also a support site at:
-% http://algorithms.berlios.de/index.html
-% Also of interest may be the (relatively newer and more customizable)
-% algorithmicx.sty package by Szasz Janos:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/
-
-
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
@@ -107,9 +89,8 @@ Bifocals can automatically recognize WebView vulnerabilities in Android applicat
 Bifocals has found 67 out of 608 (11\%) android applications with WebView-related vulnerabilities.
 
 While similar in scope to the works listed above, our proposed project differs in that it applies to the Windows Phone 8.1 platform.
-It is not guaranteed that vulnerabilities in Android also exist on the Windows platform.
-For example, one main difference between the two platforms involves their permission (“capabilities” in Windows) mechanism. With respect to Javascript attacks, the Windows Phone 8.1 platform does have a similar WebView component. 
-However, the presence of the WebVIew component does not imply the underlying implementation and security mechanisms are identical.
+With respect to Javascript attacks, the Windows Phone 8.1 platform does have a similar WebView component. 
+However, the presence of the WebVIew component does not imply the underlying implementation and security mechanisms are identical or that the same vulnerabilities exist in the Windows Phone platform.
 From our literature search, no previous work has investigated the above listed attack vectors on the Windows Phone 8.1 platform.
 
 The Windows Phone platform allows applications to be written in a number of languages, including C\#, Visual Basic, and even HTML and Javascript.
@@ -118,6 +99,43 @@ The format of the package depends on the target version.
 Applications targeting Windows Phone 8 and above, will use the new package format, \textit{appx}.
 This format resembles the \textit{zip} format and unlike the old application package format \textit{xap}, the application packages are not encrypted and can easily be unpackaged.
 An application package will include the application binary, in MSIL/CIL format, any supporting libraries, necessary media files, as well as manifest files describing the application and its properties such as the required capabilities, prerequisites, resources and even visual elements (similar to activities in the Android platform).
+As mentioned above applications may contain a WebView component.
+Such components are used to display any remote web content.
+To improve the functionality of WebView components, Javascript may be executed and can interact with the application code via Javascript handlers.
+An example of a Javascript handler can be seen in Listing \ref{jshandler}.
+There we see how a Javascript handler is associated with a specific WebView object via the \textit{addEventListener()} function call.
+Below that we see the actual Javascript handler and the contents of its body.
+Notice how the developer of the application can choose to check the calling URI inside the Javascript handler.
+Such practice should be enforced as it enforces the Same Origin Policy.
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    %backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+ 
+\lstinputlisting[label=jshandler, caption= An example of a Javascript handler, language=C]{jsHandlerExample.txt}
 
 \section{Methodology}
 

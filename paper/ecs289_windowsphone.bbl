@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{cecil}
+Cecil.
+\newblock
+  \url{http://www.mono-project.com/docs/tools\+libraries/libraries/Mono.Cecil}.
+
 \bibitem{chin2014bifocals}
 E.~Chin and D.~Wagner.
 \newblock Bifocals: Analyzing webview vulnerabilities in android applications.
@@ -18,5 +23,9 @@ T.~Luo, H.~Hao, W.~Du, Y.~Wang, and H.~Yin.
 \newblock Attacks on webview in the android system.
 \newblock In {\em Proceedings of the 27th Annual Computer Security Applications
   Conference}, pages 343--352. ACM, 2011.
+
+\bibitem{mono}
+{Mono}: Cross-platform, open source .net framework.
+\newblock \url{http://www.mono-project.com/}.
 
 \end{thebibliography}
