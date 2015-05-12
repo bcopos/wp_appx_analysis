@@ -139,6 +139,27 @@ The contents of the application packages include the application binary (in MSIL
 
 \subsection{Analysis}
 
+%TODO citations
+The analysis is done directly on the application binaries using the Cecil library \cite{cecil}.
+Cecil is a library used to generate and inspect binaries in the MSIL format.
+The library is built on top of Mono, an open source .NET framework alternative \cite{mono}
+Using Cecil, we read the assembly of every application.
+First, the assembly is parsed for prerequisites.
+Specifically, we check that the applications uses the WebView component.
+If so, our analysis verifies that the application implements Javascript handlers.
+Last but not least, it also searches for sensitive API functions among the methods called by these handlers.
+If none are found, the analysis process ends.
+If sensitive functions are called, the analysis performs intra-procedural data flow analysis.
+The objective here is to determine if data from the Javascript (passed via arguments to the Javascript handlers) flows into arguments of the sensitive API functions.
+Intra-procedural refers to the fact that the data flow analysis is performed individually for every method, compared to inter-procedural analysis, where methods are inlined beforehand.
+The data flow analysis is done by stepping through the instructions of a given method and simulating the stack.
+For this, our analysis has the behavior of every MSIL opcode encoded such that when a specific instruction is reached, the appropriate steps are taken with respect to the stack.
+To detect if data flows from the Javascript to a method call, our analysis looks to see if inside the Javascript handler, the arguments are loaded (using the \textit{ldarg} instruction) and then later used by a \textit{call} instruction of a sensitive API function.
+Since this may not always be a direct data transfer, our analysis mimics the process of taint analysis.
+For example, let's say an object is created inside the Javascript handler.
+One of the parameters (or its value) of the Javascript handler is then stored as a field of the newly created object.
+Later in the handler's body, the object is passed to a sensitive API as an argument.
+Our analysis is capable of detecting such cases by marking the object (the object reference, more specifically) as tainted, as soon as the field of the object represents the value of the handler's parameter.
 
 \section{Results}
 
