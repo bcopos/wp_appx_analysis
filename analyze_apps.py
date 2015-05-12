@@ -649,7 +649,7 @@ def dataFlow(method, fstack, ins_index, memory):
 		elif opcode in SPECIAL_INS:
 			specialIns(method, cur_ins, ins_index, fstack, memory)
 		elif opcode in BRANCH_INS:
-			branchIns(method, cur_ins, ins_index, fstack, memory)
+			branchIns(method, cur_ins, ins_index, list(fstack), dict(memory))
 		elif opcode in [Cil.OpCodes.Newobj, Cil.OpCodes.Newarr]:
 			newIns(method, cur_ins, ins_index, fstack, memory)
 		else:
