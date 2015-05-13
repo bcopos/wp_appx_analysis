@@ -157,7 +157,6 @@ The contents of the application packages include the application binary (in MSIL
 
 \subsection{Analysis}
 
-%TODO citations
 The analysis is done directly on the application binaries using the Cecil library \cite{cecil}.
 Cecil is a library used to generate and inspect binaries in the MSIL format.
 The library is built on top of Mono, an open source .NET framework alternative \cite{mono}
@@ -186,7 +185,7 @@ Out of the 490 applications, only 5 applications use a WebView component.
 4 out of those 5 applications also implement a Javascript handler.
 3 of the 4 applications which have a Javascript handler are different versions of the same application.
 Our analysis also determined that these 3 applications call the \textit{ShowPhoneCallUI} method.
-Also, the programmatically controlled number inserted into the phone UI is controlled by the Javascript.
+Also, the number inserted into the phone UI is controlled by the Javascript.
 
 None of the 4 applications check the ``calling URI" within their Javascript handlers.
 Although it could be more dangerous and detrimental if the handlers executed a sensitive API, not verifying the ``calling URI" is considered bad practice.
