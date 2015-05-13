@@ -31,9 +31,9 @@ Email: mhzhu@ucdavis.edu}
 Smartphone platforms have become an intriguing target for malicious attackers, specifically due to the amount of sensitive information available on devices.
 While the Android platform has been extensively studied, Windows Phone platform has received little attention from researchers.
 In this paper, we present a framework designed to analyze the security of Windows Phone applications which use a WebView component and implement Javascript handlers, a known attack vector in the Android ecosystem.
-%TODO
 Our results show that few applications use the WebView component but out of those 80\% applications use Javascript handlers.
-Furthermore, [something about calling uri]
+Our analysis was also able to detect a few cases in which the Javascript can cause the application to display the phone call UI and can control the number automatically inserted into the UI.
+Furthermore, our analysis discovered that none of the applications using Javascript handlers verify the calling URI.
 \end{abstract}
 
 
@@ -181,13 +181,14 @@ Our analysis is capable of detecting such cases by marking the object (the objec
 
 \section{Results}
 
-Unfortunately, despite gathering 490 applications, the number of applications which met our prerequisites for the applications is only 4.
+Unfortunately, despite gathering 490 applications, only 4 applications met our prerequisites.
 Out of the 490 applications, only 5 applications use a WebView component.
 4 out of those 5 applications also implement a Javascript handler.
 3 of the 4 applications which have a Javascript handler are different versions of the same application.
-Our analysis also determined that none of the Javascript handlers discovered called a sensitive API function, directly or indirectly.
+Our analysis also determined that these 3 applications call the \textit{ShowPhoneCallUI} method.
+Also, the programmatically controlled number inserted into the phone UI is controlled by the Javascript.
 
-Furthermore, out of the 4 applications, [NUMBER] applications check the ``calling URI" within their Javascript handlers.
+None of the 4 applications check the ``calling URI" within their Javascript handlers.
 Although it could be more dangerous and detrimental if the handlers executed a sensitive API, not verifying the ``calling URI" is considered bad practice.
 
 \section{Challenges}
