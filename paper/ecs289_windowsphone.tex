@@ -47,7 +47,7 @@ Due to its initial lack in popularity among smartphone users, the Windows Phone 
 However, the platform has similarities to other smartphone platforms such as Android and may be vulnerable to similar attacks. 
 One of the most prevalent vulnerability classes in the smartphone environment is data leakage. 
 Data leakage attacks can happen in several ways. 
-One way involves malicious application developers who construct an application with the capabilities necessary to access usersÕ sensitive data.
+One way involves malicious application developers who construct an application with the capabilities necessary to access usersï¿½ sensitive data.
 Once collected, the data is sent back to the attackers.
 Another popular attack vector is through the WebView component. 
 The WebView is a component which allows developers to display remote web content such as HTML pages and Javascript. 
@@ -63,17 +63,17 @@ The collected applications were used to test our analysis tool.
 Previous works which have studied the security of data in smartphone platforms can be split into two categories.
 One category assumes a careless or perhaps even malicious application developer.
 In such cases, sensitive data is extracted by the application using permissions and is transmitted off the device via SMS, MMS or any other method for transmitting data externally.
-The work of William Enck et. al. presented in ÒTaintDroid: An Information-Flow Tracking System for Realtime Privacy Monitoring on SmartphonesÓ \cite{enck2014taintdroid} falls under this category.
+The work of William Enck et. al. presented in ï¿½TaintDroid: An Information-Flow Tracking System for Realtime Privacy Monitoring on Smartphonesï¿½ \cite{enck2014taintdroid} falls under this category.
 As part of their work, they developed a dynamic taint-tracking system for Android applications.
 The taint-tracking system works by tracing data through the application during execution.
-Specifically, the applicationÕs sources and sinks are specified.
+Specifically, the applicationï¿½s sources and sinks are specified.
 A source in this case is any API function call which results in sensitive data being gathered.
 Some examples of sensitive data are contacts and media files.
 Sinks are API functions which transmit data off of the device.
 Some examples of sinks are the \textit{sendSMS()} and \textit{sendMMS()} functions.
 Once sources are defined, the application is executed and exercised.
 During the execution, the taint tracking system follows data from the sources to determine if it ever enters a sinks.
-TaintDroid, as a dynamic approach, involves a modified version of the AndroidÕs Dalvik Virtual Machine which allows for the tagging of data during execution.
+TaintDroid, as a dynamic approach, involves a modified version of the Androidï¿½s Dalvik Virtual Machine which allows for the tagging of data during execution.
 This technique allows TaintDroid to track data across applications (i.e. inter-process communication) as well as when an application calls native code (e.g. third party library shared object).
 While this method adds some overhead, the results are more accurate than that of static taint tracking or data flow analysis tools.
 Furthermore, TaintDroid was tested on 30 random, popular, third-party applications.
@@ -81,15 +81,15 @@ The results showed that two thirds of the applications studied display suspiciou
 Moreover, the findings show that half of the applications studied released sensitive data such as GPS location to third-party advertising companies through advertisement libraries.
 
 The second category assumes a benign application which is attacked by third party code, either through Javascript or inter-process communication.
-Example of works in this category are Luo et. al.Õs ÒAttacks on WebView in the AndroidÓ \cite{luo2011attacks} and ÒBifocals: Analyzing WebView Vulnerabilities in Android ApplicationsÓ  \cite{chin2014bifocals} where Erika Chin et. al. presented a tool for examining Android applications and their WebView components.
+Example of works in this category are Luo et. al.ï¿½s ï¿½Attacks on WebView in the Androidï¿½ \cite{luo2011attacks} and ï¿½Bifocals: Analyzing WebView Vulnerabilities in Android Applicationsï¿½  \cite{chin2014bifocals} where Erika Chin et. al. presented a tool for examining Android applications and their WebView components.
 Specifically, the Bifocals tool detected vulnerabilities which make excess authorization attacks and file-based cross-zone scripting attacks possible.
 Excess authorization attacks are attacks where malicious Javascript invokes application code (via Javascript interfaces).
 When a WebView enables Javascript and registers a Javascript interface, Javascript content in the WebView can invoke the registered interfaces.
-Any malicious third-party Javascript which gets loaded in the WebView page (for example through a man-in-the-middle attack) can also invoke the applicationÕs interface.
+Any malicious third-party Javascript which gets loaded in the WebView page (for example through a man-in-the-middle attack) can also invoke the applicationï¿½s interface.
 Depending on the functionality of the application code, excess authorization vulnerability can cause various security implications such as information injection and leakage.
-File-based cross-zone scripting attacks occur when Javascripts have access to the deviceÕs file system.
-The Android WebView renderer treats everything loaded via a Òfile://Ó URL as being in the same origin.
-If an application loads static content via a Òfile://Ó URL, and  unfortunately this content includes malicious JavaScript, this JavaScript has the ability to access all the files in the file system that the application can.
+File-based cross-zone scripting attacks occur when Javascripts have access to the deviceï¿½s file system.
+The Android WebView renderer treats everything loaded via a ï¿½file://ï¿½ URL as being in the same origin.
+If an application loads static content via a ï¿½file://ï¿½ URL, and  unfortunately this content includes malicious JavaScript, this JavaScript has the ability to access all the files in the file system that the application can.
 Bifocals can automatically recognize WebView vulnerabilities in Android applications by analyzing two aspects of WebView interaction, the application and the web content.
 Bifocals has found 67 out of 608 (11\%) android applications with WebView-related vulnerabilities.
 
@@ -157,7 +157,7 @@ The Windows Phone store application crawler enables us to achieve this goal.
 The crawler takes advantage of the fact that Microsoft's Bing search engine indexes the Windows Phone application store.
 This allows a Bing user to query the application store.
 More specifically, using a special query, any user can obtain download links for all Windows Phone store applications of the newer \textit{appx} format.
-The \textit{appx} format started being used in version [VERSION] of the Windows Phone platform.
+%The \textit{appx} format started being used in version [VERSION] of the Windows Phone platform.
 Our crawler works by accessing the Bing search engine, providing the special query and crawling the Bing result pages for the download links.
 Once the links are gathered, the downloading of application packages begins.
 As mentioned earlier, the contents of the application packages include the application binary (in MSIL/CIL format) and other resources.
@@ -200,6 +200,12 @@ Although it could be more dangerous and detrimental if the handlers executed a s
 
 \section{Challenges}
 
+Applications :  Windows phone applications can be written in a number of languages such as C\#,Visual Basic,HTML and Javascript---which makes our analysis difficult. Also, since applications can be written directly in HTML and Javascript, such applications will not have a WebView component. Such applications limit the sample set we can test our framework in.
+
+Analysis tools : Windows Phone applications are written into C\#, compiled to an intermediate language and then packaged into ".appx" format. While the unpackaging is easy, interpreting the intermediate language (MSIL\/CIL) files is not easy. To perform the analysis, we must learn what every instructions opcode does and how it affects the stack. This process is tedious and a small mistake can skew our results.
+
+Time : This course is only 16 weeks long. Because of such short time table, any unexpected difficulties can greatly impact the deliverables of this project.
+
 % - allowing applications to be written in multiple languages makes analysis difficult
 % - presumably developers will write applications in html and js directly for easy portability to other platforms (using Apache Cordova or Phonegap). in such cases no webview is needed, lowering the number of applications which meet the prerequisites of our analysis
 % - data flow challenges, dealing with bytecode instructions, needing to know what the opcodes mean and how they affect the execution, especially the stack
@@ -212,8 +218,7 @@ In the future, we would like to extend our framework to also search for such app
 Additionally, we would like to change our data flow analysis from intra-procedural to inter-procedural for more accurate analysis.
 
 \section{Conclusion}
-The conclusion goes here.
-
+In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 490 applications. The results show that five applications usethe WebView component. Out of the applications which include at least a WebView component, 80\% also use Javascript handlers.
 
 \section*{Acknowledgment}
 The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor Professor Matt Bishop.
