@@ -14,12 +14,19 @@ The analysis occurs in two steps:
 	- check if application has ScriptNotifyEvent handlers
 	- if none apply, stop
 2. Data and control analysis
-	- for ScriptNotifyEvent handlers, build call graph
+	- for ScriptNotifyEvent handlers
 		- find all functions called by a handler (both directly and indirectly)
 		- filter called functions for sensitive Windows Runtime API functions
 		- if API functions found in the call graph, examine data dependency
 			- check if there is data dependency between data coming from JS via handlers to API functions
 
+Data Dependency
+-----
+
+- obtain all instructions of a given method (e.g. handler)
+- step through instructions simulating stack (and memory)
+- determine if the sensitive API function call takes in tainted data
+	- tainted data = data that may be (or contain) data from the handler's parameters
 
 What else?
 ------

@@ -20,7 +20,7 @@ import os
 import string
 import random
 import subprocess
-from StackElement import StackElement
+from helpers.StackElement import StackElement
 
 apps_dir = "C:\\Users\\b\\Downloads\\apps"
 unzipped_apps_dir = "C:\\Users\\b\\Downloads\\apps\\unzipped"
