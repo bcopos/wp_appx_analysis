@@ -195,20 +195,16 @@ Out of the 490 applications, only 5 applications use a WebView component.
 Our analysis also determined that these 3 applications call the \textit{ShowPhoneCallUI} method.
 Also, the number inserted into the phone UI is controlled by the Javascript.
 
-None of the 4 applications check the ``calling URI" within their Javascript handlers.
-Although it could be more dangerous and detrimental if the handlers executed a sensitive API, not verifying the ``calling URI" is considered bad practice.
+None of the 4 applications check the calling URI within their Javascript handlers.
+Although it could be more dangerous and detrimental if the handlers executed a sensitive API, not verifying the calling URI is considered bad practice.
 
 \section{Challenges}
 
-Applications :  Windows phone applications can be written in a number of languages such as C\#,Visual Basic,HTML and Javascript---which makes our analysis difficult. Also, since applications can be written directly in HTML and Javascript, such applications will not have a WebView component. Such applications limit the sample set we can test our framework in.
+Applications :  Windows phone applications can be written in a number of languages such as C\#, Visual Basic, HTML and Javascript---which makes our analysis difficult. Also, since applications can be written directly in HTML and Javascript, such applications will not have a WebView component. Such applications limit the sample set we can test our framework in.
 
-Analysis tools : Windows Phone applications are written into C\#, compiled to an intermediate language and then packaged into ".appx" format. While the unpackaging is easy, interpreting the intermediate language (MSIL\/CIL) files is not easy. To perform the analysis, we must learn what every instructions opcode does and how it affects the stack. This process is tedious and a small mistake can skew our results.
+Analysis tools : Windows Phone applications are written in C\#, compiled to an intermediate language and then packaged into the ``.appx" format. While the unpacking is easy, interpreting the intermediate language (MSIL/CIL) files is not easy. To perform the analysis, we must learn what every instructions opcode does and how it affects the stack. This process is tedious and a small mistake can skew our results.
 
 Time : This course is only 16 weeks long. Because of such short time table, any unexpected difficulties can greatly impact the deliverables of this project.
-
-% - allowing applications to be written in multiple languages makes analysis difficult
-% - presumably developers will write applications in html and js directly for easy portability to other platforms (using Apache Cordova or Phonegap). in such cases no webview is needed, lowering the number of applications which meet the prerequisites of our analysis
-% - data flow challenges, dealing with bytecode instructions, needing to know what the opcodes mean and how they affect the execution, especially the stack
 
 \section{Future Work}
 
@@ -218,7 +214,7 @@ In the future, we would like to extend our framework to also search for such app
 Additionally, we would like to change our data flow analysis from intra-procedural to inter-procedural for more accurate analysis.
 
 \section{Conclusion}
-In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 490 applications. The results show that five applications usethe WebView component. Out of the applications which include at least a WebView component, 80\% also use Javascript handlers.
+In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 490 applications. The results show that five applications use the WebView component. Out of the applications which include at least one WebView component, 80\% also use Javascript handlers.
 
 \section*{Acknowledgment}
 The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor Professor Matt Bishop.
