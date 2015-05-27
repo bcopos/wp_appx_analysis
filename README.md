@@ -1,7 +1,7 @@
 Windows Phone 8.1 Appx Application Analysis
 ==========
 
-Tool created to analyze security of Windows Phone 8.1 applications (appx format).
+Tool, based on [Mono.Cecil](http://www.mono-project.com/docs/tools+libraries/libraries/Mono.Cecil/), created to analyze security of Windows Phone 8.1 applications (appx format).
 Specifically, the tool analyzes applications to see if a given application can be attacked by Javascripts loaded within the application's WebView.
 
 How?
@@ -31,7 +31,7 @@ Data Dependency
 What else?
 ------
 
-- check if developers check `callingUri` in ScriptNotifyEvent handlers
+- verify that developers check `callingUri` in ScriptNotifyEvent handlers
 
 
 Code Example of handlers
