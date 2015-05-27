@@ -55,11 +55,11 @@ Get Started
 ------
 
 Prerequisites:
-- Mono.Cecil
-- IronPython
-- zip utility (by default it uses `7za`)
+- [Mono.Cecil](http://www.mono-project.com/docs/tools+libraries/libraries/Mono.Cecil/)
+- [IronPython](http://ironpython.net/)
+- zip utility (by default it uses [7za](http://www.7-zip.org/))
 
 To run:
-1) Check `analyze\_apps` script (mainly the `sys.path.append` at the top)
-2) Run with IronPython: `ipy.exe analyze_apps`
+1. Check `analyze\_apps` script (mainly the `sys.path.append` at the top)
+2. Run with IronPython: `ipy.exe analyze_apps`
 
