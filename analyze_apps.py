@@ -15,28 +15,58 @@ clr.AddReference("Mono.Cecil")
 from Mono.Cecil import *
 import sys
 sys.path.append("C:\Program Files (x86)\IronPython 2.7\Lib")
-#sys.path.append("C:\\Users\b\\Downloads")
 import os
 import string
 import random
 import subprocess
+import argparse
 from helpers.StackElement import StackElement
 
-apps_dir = "C:\\Users\\b\\Downloads\\apps"
-unzipped_apps_dir = "C:\\Users\\b\\Downloads\\apps\\unzipped"
-UNZIP = "C:\\Users\\b\\Downloads\\7za920\\7za.exe"
+cwd = os.path.dirname(os.path.abspath(__file__))
+
+#APPS = "C:\\Users\\b\\Downloads\\apps"
+#UNZIPPED = "C:\\Users\\b\\Downloads\\apps\\unzipped"
+#ZIP = "C:\\Users\\b\\Downloads\\7za920\\7za.exe"
+
+
+PUSH_INS = [ Cil.OpCodes.Ldarg_0, Cil.OpCodes.Ldarg_1, Cil.OpCodes.Ldarg_2, Cil.OpCodes.Ldarg_3, Cil.OpCodes.Ldarg_S, Cil.OpCodes.Ldarga_S, Cil.OpCodes.Ldc_I4_M1, Cil.OpCodes.Ldc_I4_0, Cil.OpCodes.Ldc_I4_1, Cil.OpCodes.Ldc_I4_2, Cil.OpCodes.Ldc_I4_3, Cil.OpCodes.Ldc_I4_4, Cil.OpCodes.Ldc_I4_5, Cil.OpCodes.Ldc_I4_6, Cil.OpCodes.Ldc_I4_7, Cil.OpCodes.Ldc_I4_8, Cil.OpCodes.Ldc_I4_S, Cil.OpCodes.Ldc_I4, Cil.OpCodes.Ldc_R4, Cil.OpCodes.Ldc_R8, Cil.OpCodes.Ldelema, Cil.OpCodes.Ldelem_I1, Cil.OpCodes.Ldelem_U1, Cil.OpCodes.Ldelem_I2, Cil.OpCodes.Ldelem_U2, Cil.OpCodes.Ldelem_I4, Cil.OpCodes.Ldelem_U4, Cil.OpCodes.Ldelem_I8, Cil.OpCodes.Ldelem_I, Cil.OpCodes.Ldelem_R4, Cil.OpCodes.Ldelem_R8, Cil.OpCodes.Ldelem_Ref, Cil.OpCodes.Ldfld, Cil.OpCodes.Ldflda,  Cil.OpCodes.Ldind_I1, Cil.OpCodes.Ldind_U1, Cil.OpCodes.Ldind_I2, Cil.OpCodes.Ldind_U2, Cil.OpCodes.Ldind_I4, Cil.OpCodes.Ldind_U4, Cil.OpCodes.Ldind_I8, Cil.OpCodes.Ldind_I, Cil.OpCodes.Ldind_R4, Cil.OpCodes.Ldind_R8, Cil.OpCodes.Ldind_Ref, Cil.OpCodes.Ldlen, Cil.OpCodes.Ldloc, Cil.OpCodes.Ldloca, Cil.OpCodes.Ldloc_S, Cil.OpCodes.Ldloca_S, Cil.OpCodes.Ldnull, Cil.OpCodes.Ldobj, Cil.OpCodes.Unaligned, Cil.OpCodes.Volatile, Cil.OpCodes.Sizeof, Cil.OpCodes.Ldvirtftn, Cil.OpCodes.Ldtoken, Cil.OpCodes.Ldsfld, Cil.OpCodes.Ldsflda, Cil.OpCodes.Ldstr ]
+POP_INS = [ Cil.OpCodes.Starg, Cil.OpCodes.Starg_S, Cil.OpCodes.Stelem_I, Cil.OpCodes.Stelem_I1, Cil.OpCodes.Stelem_I2, Cil.OpCodes.Stelem_I4, Cil.OpCodes.Stelem_I8, Cil.OpCodes.Stelem_R4, Cil.OpCodes.Stelem_R8, Cil.OpCodes.Stelem_Ref, Cil.OpCodes.Stelem_Any, Cil.OpCodes.Stfld, Cil.OpCodes.Stind_Ref, Cil.OpCodes.Stind_I1, Cil.OpCodes.Stind_I2, Cil.OpCodes.Stind_I4, Cil.OpCodes.Stind_I8, Cil.OpCodes.Stind_R4, Cil.OpCodes.Stind_R8, Cil.OpCodes.Stind_I, Cil.OpCodes.Stloc, Cil.OpCodes.Stloc_0, Cil.OpCodes.Stloc_1, Cil.OpCodes.Stloc_2, Cil.OpCodes.Stloc_3, Cil.OpCodes.Stloc_S, Cil.OpCodes.Stobj, Cil.OpCodes.Stsfld, Cil.OpCodes.Initblk, Cil.OpCodes.Initobj, Cil.OpCodes.Endfilter, Cil.OpCodes.Throw, Cil.OpCodes.Pop, Cil.OpCodes.Cpblk, Cil.OpCodes.Cpobj ]
+BRANCH_INS = [ Cil.OpCodes.Beq, Cil.OpCodes.Beq_S, Cil.OpCodes.Bge, Cil.OpCodes.Bge_S, Cil.OpCodes.Bge_Un_S, Cil.OpCodes.Bge_Un, Cil.OpCodes.Bgt, Cil.OpCodes.Bgt_S, Cil.OpCodes.Bgt_Un, Cil.OpCodes.Bgt_Un_S, Cil.OpCodes.Ble, Cil.OpCodes.Ble_S, Cil.OpCodes.Ble_Un, Cil.OpCodes.Ble_Un_S, Cil.OpCodes.Blt, Cil.OpCodes.Blt_S, Cil.OpCodes.Blt_Un, Cil.OpCodes.Blt_Un_S, Cil.OpCodes.Bne_Un, Cil.OpCodes.Bne_Un_S ]
+SWITCH_INS = [ Cil.OpCodes.Switch ]
+BREAK_INS = [ Cil.OpCodes.Break ]
+SPECIAL_INS = [ Cil.OpCodes.Call, Cil.OpCodes.Callvirt, Cil.OpCodes.Add, Cil.OpCodes.Box, Cil.OpCodes.Castclass, Cil.OpCodes.Ceq, Cil.OpCodes.Cgt, Cil.OpCodes.Cgt_Un, Cil.OpCodes.Ckfinite, Cil.OpCodes.Clt, Cil.OpCodes.Clt_Un, Cil.OpCodes.Conv_I, Cil.OpCodes.Conv_I1, Cil.OpCodes.Conv_I2, Cil.OpCodes.Conv_I4, Cil.OpCodes.Conv_I8, Cil.OpCodes.Conv_Ovf_I, Cil.OpCodes.Conv_Ovf_I_Un, Cil.OpCodes.Conv_Ovf_I1, Cil.OpCodes.Conv_Ovf_I1_Un, Cil.OpCodes.Conv_Ovf_I2, Cil.OpCodes.Conv_Ovf_I2_Un, Cil.OpCodes.Conv_Ovf_I4, Cil.OpCodes.Conv_Ovf_I4_Un, Cil.OpCodes.Conv_Ovf_I8, Cil.OpCodes.Conv_Ovf_I8_Un, Cil.OpCodes.Conv_Ovf_U, Cil.OpCodes.Conv_Ovf_U_Un, Cil.OpCodes.Conv_Ovf_U1, Cil.OpCodes.Conv_Ovf_U1_Un, Cil.OpCodes.Conv_Ovf_U2, Cil.OpCodes.Conv_Ovf_U2_Un, Cil.OpCodes.Conv_Ovf_U4, Cil.OpCodes.Conv_Ovf_U4_Un, Cil.OpCodes.Conv_Ovf_U8, Cil.OpCodes.Conv_Ovf_U8_Un, Cil.OpCodes.Conv_R_Un, Cil.OpCodes.Conv_R4, Cil.OpCodes.Conv_R8, Cil.OpCodes.Conv_U, Cil.OpCodes.Conv_U1, Cil.OpCodes.Conv_U2, Cil.OpCodes.Conv_U4, Cil.OpCodes.Conv_U8, Cil.OpCodes.Div, Cil.OpCodes.Div_Un, Cil.OpCodes.Dup, Cil.OpCodes.Isinst, Cil.OpCodes.Localloc, Cil.OpCodes.Mkrefany, Cil.OpCodes.Mul, Cil.OpCodes.Not, Cil.OpCodes.Or, Cil.OpCodes.Refanytype, Cil.OpCodes.Refanyval, Cil.OpCodes.Rem, Cil.OpCodes.Rem_Un, Cil.OpCodes.Ret, Cil.OpCodes.Shl, Cil.OpCodes.Shr, Cil.OpCodes.Shr_Un, Cil.OpCodes.Sub, Cil.OpCodes.Sub_Ovf, Cil.OpCodes.Sub_Ovf_Un, Cil.OpCodes.Unbox, Cil.OpCodes.Unbox_Any, Cil.OpCodes.Xor]
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-a','--apps', type=str, required=True, help="path of directory containing (packed) applications")
+	parser.add_argument('-u','--unzipped', type=str, required=True, help="path of directory where unzipped applications will be stored")
+	parser.add_argument('-z','--zip', type=str, required=True, help="zip application (used for unpacking applications)")
+	parser.add_argument('-o','--output', type=str, required=False, default=os.path.join(cwd, "results.txt"), help="output file (with path)")
+	parser.add_argument('-s','--sensitiveapi', type=str, required=False, default=os.path.join(cwd, "sensitive_api.txt"), help="file containing sensitive API function list (with path)")
+	
+	args = parser.parse_args()
+	global APPS
+	global UNZIPPED
+	global ZIP
+	global OUTPUT
+	global SENSITIVEAPI
+	APPS = args.apps
+	UNZIPPED = args.unzipped
+	ZIP = args.zip
+	OUTPUT = args.output
+	SENSITIVEAPI = args.sensitiveapi
+	main()
 
 def main():
-	of = open('blah.txt', 'w')
+	of = open(OUTPUT, 'w')
 	of.write('')
 	of.close()
-
 	
 	for f in os.listdir(apps_dir):
 		if '.appx' in f:
 			app_folder = unzipped_apps_dir + "\\" + str(f)
 			if not os.path.isdir(app_folder):
-				cmd = UNZIP + ' x -o' + app_folder + ' -y ' + str(os.path.join(apps_dir, f))
+				cmd = ZIP + ' x -o' + app_folder + ' -y ' + str(os.path.join(apps_dir, f))
 				rc = subprocess.call(cmd, shell=True)
 				if rc:
 					print "unzipping failed"
@@ -46,7 +76,7 @@ def main():
 			for f in os.listdir(os.path.join(unzipped_apps_dir, d)):
 				f_dir = os.path.join(unzipped_apps_dir, d)
 				if f.endswith('exe'):
-					of = open('blah.txt', 'a')
+					of = open(OUTPUT, 'a')
 					of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 					of.close()
 					
@@ -59,11 +89,48 @@ def main():
 					handlers = searchScriptNotifyHandler(asm)
 					
 					for handler in handlers:
-						of = open("blah.txt", "a")
+						callsSensitiveApi = False
+						of = open(OUTPUT, "a")
 						of.write("HANDLER: " + str(handler.Name) + "\n")
 						of.write("METHODS CALLED: \n")
 						of.close()
-						getMethodsCalled(handler)
+						findCallingUri(handler)
+						methods_called = list()
+						getMethodsCalled(handler, methods_called)
+						api_list = getSensitiveApi()
+						for m in methods_called:
+							if m in api_list:
+								callsSensitiveApi = True
+								break
+							
+						if callsSensitiveApi:
+							dataFlow(handler, [], 0, dict()):
+						
+						
+
+def getSensitiveApi():
+	f = open(SENSITIVEAPI, 'r')
+	apis = f.readlines()
+	f.close()
+	
+	api_list = list()
+	for api in apis:
+		if not api == "":
+			api_list.append(api.ToLower())
+	return api_list
+						
+'''
+	Looks for checks of the NotifyEventArgs.CallingUri property
+'''
+def findCallingUri(method):
+	if method.Body:
+		for i in method.Body.Instructions:
+			if i.OpCode == Cil.Opcodes.Callvirt:
+				if i.Operand.DeclaringType.FullName == "Windows.UI.Xaml.Controls.NotifyEventArgs"  and \
+					i.Operand.Name == "get_CallingUri":
+					of = open(OUTPUT, "a")
+					of.write("HANDLER: " + str(method.Name) + " CHECKS CALLING URI\n")
+					of.close()
 
 '''
 	Searches for NotifyEventHandler (aka ScriptNotify) handlers
@@ -79,7 +146,7 @@ def searchScriptNotifyHandler(asm):
 			for method in t.Methods:
 				if method.Body:
 					for i in method.Body.Instructions:
-						if i.OpCode.Name == "newobj":
+						if i.OpCode == Cil.OpCodes.Newobj:
 							if i.Operand:
 								if i.Operand.DeclaringType.FullName == "Windows.UI.Xaml.Controls.NotifyEventHandler":
 									handlers.append(i.Previous.Operand.GetElementMethod())
@@ -103,35 +170,41 @@ def checkForWebView(asm):
 									return True
 	return False
 	
-def getMethodsCalled(method):
+def getMethodsCalled(method, methods_called):
 	if method.GetType().Name == "MethodDefinition":
 		if method.Body:
 			for i in method.Body.Instructions:
 				if "call" in i.OpCode.Name:
-					of = open("blah.txt", "a")
+					of = open(OUTPUT, "a")
 					of.write("\t" + str(i.Operand.Name) + "\n")
 					of.close()
-					getMethodsCalled(i.Operand.GetElementMethod())
-
+					methods_called.append(i.Operand.GetElementMethod())
+					getMethodsCalled(i.Operand.GetElementMethod(), methods_called)
+	
 '''
 	Returns number of parameters for a given method
 '''
 def getMethodParamCount(method):
 	return method.Parameters.Count
 
+def generateRandomAddress():
+	return ''.join(random.choice(string.ascii_uppercase[0:6] + string.digits) for _ in range(10))
+
+# e.g. findInsOfInterest(method, cur_index, "ret") finds the next return ins from the current index
+def findInsOfInterest(method, cur_index, target):
+	ins = method.Body.Instructions[cur_index]
+	while ins.Next:
+		ins = ins.Next
+		cur_index += 1
+		if target in ins.ToString():
+			return cur_index
+	return 0
+	
 '''
 	Traces data from current method's parameters to the parameters of a method called within
 	
 	e.g. foo(int x, int y) { bar(x) }  # traces foo's param x to argument of bar() func	
 '''
-PUSH_INS = [ Cil.OpCodes.Ldarg_0, Cil.OpCodes.Ldarg_1, Cil.OpCodes.Ldarg_2, Cil.OpCodes.Ldarg_3, Cil.OpCodes.Ldarg_S, Cil.OpCodes.Ldarga_S, Cil.OpCodes.Ldc_I4_M1, Cil.OpCodes.Ldc_I4_0, Cil.OpCodes.Ldc_I4_1, Cil.OpCodes.Ldc_I4_2, Cil.OpCodes.Ldc_I4_3, Cil.OpCodes.Ldc_I4_4, Cil.OpCodes.Ldc_I4_5, Cil.OpCodes.Ldc_I4_6, Cil.OpCodes.Ldc_I4_7, Cil.OpCodes.Ldc_I4_8, Cil.OpCodes.Ldc_I4_S, Cil.OpCodes.Ldc_I4, Cil.OpCodes.Ldc_R4, Cil.OpCodes.Ldc_R8, Cil.OpCodes.Ldelema, Cil.OpCodes.Ldelem_I1, Cil.OpCodes.Ldelem_U1, Cil.OpCodes.Ldelem_I2, Cil.OpCodes.Ldelem_U2, Cil.OpCodes.Ldelem_I4, Cil.OpCodes.Ldelem_U4, Cil.OpCodes.Ldelem_I8, Cil.OpCodes.Ldelem_I, Cil.OpCodes.Ldelem_R4, Cil.OpCodes.Ldelem_R8, Cil.OpCodes.Ldelem_Ref, Cil.OpCodes.Ldfld, Cil.OpCodes.Ldflda,  Cil.OpCodes.Ldind_I1, Cil.OpCodes.Ldind_U1, Cil.OpCodes.Ldind_I2, Cil.OpCodes.Ldind_U2, Cil.OpCodes.Ldind_I4, Cil.OpCodes.Ldind_U4, Cil.OpCodes.Ldind_I8, Cil.OpCodes.Ldind_I, Cil.OpCodes.Ldind_R4, Cil.OpCodes.Ldind_R8, Cil.OpCodes.Ldind_Ref, Cil.OpCodes.Ldlen, Cil.OpCodes.Ldloc, Cil.OpCodes.Ldloca, Cil.OpCodes.Ldloc_S, Cil.OpCodes.Ldloca_S, Cil.OpCodes.Ldnull, Cil.OpCodes.Ldobj, Cil.OpCodes.Unaligned, Cil.OpCodes.Volatile, Cil.OpCodes.Sizeof, Cil.OpCodes.Ldvirtftn, Cil.OpCodes.Ldtoken, Cil.OpCodes.Ldsfld, Cil.OpCodes.Ldsflda, Cil.OpCodes.Ldstr ]
-
-POP_INS = [ Cil.OpCodes.Starg, Cil.OpCodes.Starg_S, Cil.OpCodes.Stelem_I, Cil.OpCodes.Stelem_I1, Cil.OpCodes.Stelem_I2, Cil.OpCodes.Stelem_I4, Cil.OpCodes.Stelem_I8, Cil.OpCodes.Stelem_R4, Cil.OpCodes.Stelem_R8, Cil.OpCodes.Stelem_Ref, Cil.OpCodes.Stelem_Any, Cil.OpCodes.Stfld, Cil.OpCodes.Stind_Ref, Cil.OpCodes.Stind_I1, Cil.OpCodes.Stind_I2, Cil.OpCodes.Stind_I4, Cil.OpCodes.Stind_I8, Cil.OpCodes.Stind_R4, Cil.OpCodes.Stind_R8, Cil.OpCodes.Stind_I, Cil.OpCodes.Stloc, Cil.OpCodes.Stloc_0, Cil.OpCodes.Stloc_1, Cil.OpCodes.Stloc_2, Cil.OpCodes.Stloc_3, Cil.OpCodes.Stloc_S, Cil.OpCodes.Stobj, Cil.OpCodes.Stsfld, Cil.OpCodes.Initblk, Cil.OpCodes.Initobj, Cil.OpCodes.Endfilter, Cil.OpCodes.Throw, Cil.OpCodes.Pop, Cil.OpCodes.Cpblk, Cil.OpCodes.Cpobj ]
-BRANCH_INS = [ Cil.OpCodes.Beq, Cil.OpCodes.Beq_S, Cil.OpCodes.Bge, Cil.OpCodes.Bge_S, Cil.OpCodes.Bge_Un_S, Cil.OpCodes.Bge_Un, Cil.OpCodes.Bgt, Cil.OpCodes.Bgt_S, Cil.OpCodes.Bgt_Un, Cil.OpCodes.Bgt_Un_S, Cil.OpCodes.Ble, Cil.OpCodes.Ble_S, Cil.OpCodes.Ble_Un, Cil.OpCodes.Ble_Un_S, Cil.OpCodes.Blt, Cil.OpCodes.Blt_S, Cil.OpCodes.Blt_Un, Cil.OpCodes.Blt_Un_S, Cil.OpCodes.Bne_Un, Cil.OpCodes.Bne_Un_S ]
-SWITCH_INS = [ Cil.OpCodes.Switch ]
-BREAK_INS = [ Cil.OpCodes.Break ]
-SPECIAL_INS = [ Cil.OpCodes.Call, Cil.OpCodes.Callvirt, Cil.OpCodes.Add, Cil.OpCodes.Box, Cil.OpCodes.Castclass, Cil.OpCodes.Ceq, Cil.OpCodes.Cgt, Cil.OpCodes.Cgt_Un, Cil.OpCodes.Ckfinite, Cil.OpCodes.Clt, Cil.OpCodes.Clt_Un, Cil.OpCodes.Conv_I, Cil.OpCodes.Conv_I1, Cil.OpCodes.Conv_I2, Cil.OpCodes.Conv_I4, Cil.OpCodes.Conv_I8, Cil.OpCodes.Conv_Ovf_I, Cil.OpCodes.Conv_Ovf_I_Un, Cil.OpCodes.Conv_Ovf_I1, Cil.OpCodes.Conv_Ovf_I1_Un, Cil.OpCodes.Conv_Ovf_I2, Cil.OpCodes.Conv_Ovf_I2_Un, Cil.OpCodes.Conv_Ovf_I4, Cil.OpCodes.Conv_Ovf_I4_Un, Cil.OpCodes.Conv_Ovf_I8, Cil.OpCodes.Conv_Ovf_I8_Un, Cil.OpCodes.Conv_Ovf_U, Cil.OpCodes.Conv_Ovf_U_Un, Cil.OpCodes.Conv_Ovf_U1, Cil.OpCodes.Conv_Ovf_U1_Un, Cil.OpCodes.Conv_Ovf_U2, Cil.OpCodes.Conv_Ovf_U2_Un, Cil.OpCodes.Conv_Ovf_U4, Cil.OpCodes.Conv_Ovf_U4_Un, Cil.OpCodes.Conv_Ovf_U8, Cil.OpCodes.Conv_Ovf_U8_Un, Cil.OpCodes.Conv_R_Un, Cil.OpCodes.Conv_R4, Cil.OpCodes.Conv_R8, Cil.OpCodes.Conv_U, Cil.OpCodes.Conv_U1, Cil.OpCodes.Conv_U2, Cil.OpCodes.Conv_U4, Cil.OpCodes.Conv_U8, Cil.OpCodes.Div, Cil.OpCodes.Div_Un, Cil.OpCodes.Dup, Cil.OpCodes.Isinst, Cil.OpCodes.Localloc, Cil.OpCodes.Mkrefany, Cil.OpCodes.Mul, Cil.OpCodes.Not, Cil.OpCodes.Or, Cil.OpCodes.Refanytype, Cil.OpCodes.Refanyval, Cil.OpCodes.Rem, Cil.OpCodes.Rem_Un, Cil.OpCodes.Ret, Cil.OpCodes.Shl, Cil.OpCodes.Shr, Cil.OpCodes.Shr_Un, Cil.OpCodes.Sub, Cil.OpCodes.Sub_Ovf, Cil.OpCodes.Sub_Ovf_Un, Cil.OpCodes.Unbox, Cil.OpCodes.Unbox_Any, Cil.OpCodes.Xor]
-
 def pushIns(method, ins, ins_index, fstack, memory):
 	if ins.OpCode in [ Cil.OpCodes.Ldarg_0, Cil.OpCodes.Ldarg_1, Cil.OpCodes.Ldarg_2, Cil.OpCodes.Ldarg_3, Cil.OpCodes.Ldarg_S, Cil.OpCodes.Ldarga_S ]:
 		argslot = ins.OpCode.ToString().split('.')[1]
@@ -620,27 +693,14 @@ def specialIns(method, ins, ins_index, fstack, memory):
 
 	else:
 		print "Not handling special ins " + ins.ToString()
-
-def generateRandomAddress():
-	return ''.join(random.choice(string.ascii_uppercase[0:6] + string.digits) for _ in range(10))
-
-# e.g. findInsOfInterest(method, cur_index, "ret") finds the next return ins from the current index
-def findInsOfInterest(method, cur_index, target):
-	ins = method.Body.Instructions[cur_index]
-	while ins.Next:
-		ins = ins.Next
-		cur_index += 1
-		if target in ins.ToString():
-			return cur_index
-	return 0
 		
-# TODO: reset memory appropriately for branch instructions
 def dataFlow(method, fstack, ins_index, memory):
 	cur_ins = method.Body.Instructions[ins_index]
 	
+	of = open(OUTPUT, 'a')
 	while True:
-		print "============================"
-		print "INS: " + cur_ins.ToString()
+		of.write("============================\n")
+		of.write("INS: " + cur_ins.ToString() + "\n")
 		opcode = cur_ins.OpCode
 		if opcode in PUSH_INS:
 			pushIns(method, cur_ins, ins_index, fstack, memory)
@@ -653,13 +713,14 @@ def dataFlow(method, fstack, ins_index, memory):
 		elif opcode in [Cil.OpCodes.Newobj, Cil.OpCodes.Newarr]:
 			newIns(method, cur_ins, ins_index, fstack, memory)
 		else:
-			print "Don't recognize ins: " + cur_ins.ToString()
+			of.write("Don't recognize ins: " + cur_ins.ToString() + "\n")
 	
-		print "STACK: " + str(fstack)
-		print "MEMORY: " + str(memory)
+		of.write("STACK: " + str(fstack) + "\n")
+		of.write("MEMORY: " + str(memory) + "\n")
 		cur_ins = cur_ins.Next
 		if not cur_ins:
 			break
+	of.close()
 	
 def test():
 	# TEST USING WEBVIEW EXAMPLE
@@ -670,7 +731,7 @@ def test():
 
 	f = "Controls_WebView.WindowsPhone.exe"
 	f_dir = "C:\\Users\\b\\Downloads\\XAML WebView control sample\\C#\\WindowsPhone\\bin\\Debug"
-	of = open('blah.txt', 'a')
+	of = open(OUTPUT, 'a')
 	of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
 	of.close()
 					
@@ -679,9 +740,9 @@ def test():
 	except SystemError:
 		print "FAILED: " + str(os.path.join(f_dir, f))
 
-	searchScriptNotifyHandler(asm)
+	handlers = searchScriptNotifyHandler(asm)
 	for handler in handlers:
-		of = open("blah.txt", "a")
+		of = open(OUTPUT, "a")
 		of.write("HANDLER: " + str(handler.Name) + "\n")
 		of.write("METHODS CALLED: \n")
 		of.close()

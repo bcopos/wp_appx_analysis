@@ -50,3 +50,16 @@ function handleScriptNotifyEvents(e) {
         }
     }
 ```
+
+Get Started
+------
+
+Prerequisites:
+- Mono.Cecil
+- IronPython
+- zip utility (by default it uses `7za`)
+
+To run:
+1) Check `analyze\_apps` script (mainly the `sys.path.append` at the top)
+2) Run with IronPython: `ipy.exe analyze_apps`
+
