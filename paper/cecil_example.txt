@@ -1,0 +1,13 @@
+try:
+	asm = AssemblyDefinition.ReadAssembly("\some\app.exe")
+except SystemError:
+	print "FAILED: " + str(os.path.join(f_dir, f))
+	return 
+
+for module in asm.Modules:
+	for type in module.Types:
+		for method in type.Methods:
+			print method.FullName
+			if method.Body:
+				for ins in method.Body.Instructions:
+					print ins

@@ -169,6 +169,10 @@ The analysis is done directly on the application binaries using the Cecil librar
 Cecil is a library used to generate and inspect binaries in the MSIL format.
 The library is built on top of Mono, an open source .NET framework alternative \cite{mono}
 Using Cecil, we sequentially read and analyze the assembly of every application.
+Listing \ref{cecilexample} shows how Cecil is used to parse a MSIL binary.
+The \textit{AssemblyDefinition.ReadAssembly} function is used to read the binary.
+Lines 7-13 show how the assembly is then queried for all Methods and all instructions within those methods.
+\lstinputlisting[caption=Example of Cecil in Python, label=cecilexample,language=Python]{cecil_example.txt}
 First, the assembly is parsed for prerequisites.
 Specifically, we check that the applications uses the WebView component.
 If so, our analysis verifies that the application implements Javascript handlers.
@@ -221,6 +225,12 @@ The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packa
 
 \bibliographystyle{abbrv}
 \bibliography{ecs289_windowsphone}
+
+\appendix
+\section{Sensitive API Function List}
+Here is the list of API functions we consider sensitive for the purpose of this project.
+Essentially, the list is composed of any function which either accesses user data (whether it's contacts or files from storage or SD card), accesses system resources (e.g. sensors, camera, etc.) or communicates with the outside world (via SMS, email, Bluetooth, etc.).
+\lstinputlisting{sensitive_api.txt}
 
 \end{document}
 
