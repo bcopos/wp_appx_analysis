@@ -60,6 +60,7 @@ Prerequisites:
 - zip utility (by default it uses [7za](http://www.7-zip.org/))
 
 To run:
+
 1. Check `analyze\_apps` script (mainly the `sys.path.append` at the top)
 2. Run with IronPython: `ipy.exe analyze_apps`
 
