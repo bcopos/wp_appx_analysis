@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	parser.add_argument('-u','--unzipped', type=str, required=True, help="path of directory where unzipped applications will be stored")
 	parser.add_argument('-z','--zip', type=str, required=True, help="zip application (used for unpacking applications)")
 	parser.add_argument('-o','--output', type=str, required=False, default=os.path.join(cwd, "results.txt"), help="output file (with path)")
-	parser.add_argument('-s','--sensitiveapi', type=str, required=False, default=os.path.join(cwd, "sensitive_api.txt"), help="file containing sensitive API function list (with path)")
+	parser.add_argument('-s','--sensitiveapi', type=str, required=False, default=os.path.join(os.path.join(cwd, "sensitiveApi"), "sensitive_api.txt"), help="file containing sensitive API function list (with path)")
 	
 	args = parser.parse_args()
 	global APPS
