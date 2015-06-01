@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	parser.add_argument('-u','--unzipped', type=str, required=True, help="path of directory where unzipped applications will be stored")
 	parser.add_argument('-z','--zip', type=str, required=True, help="zip application (used for unpacking applications)")
 	parser.add_argument('-o','--output', type=str, required=False, default=os.path.join(cwd, "results.txt"), help="output file (with path)")
-	parser.add_argument('-s','--sensitiveapi', type=str, required=False, default=os.path.join(os.path.join(cwd, "sensitiveApi"), "sensitive_api.txt"), help="file containing sensitive API function list (with path)")
+	parser.add_argument('-s','--sensitiveapi', type=str, required=False, default=os.path.join(cwd, "sensitive_api.txt"), help="file containing sensitive API function list (with path)")
 	
 	args = parser.parse_args()
 	global APPS
@@ -58,23 +58,33 @@ if __name__ == '__main__':
 	main()
 
 def main():
+	# NOTE: lines below are for testing purposes only 
+	#global OUTPUT, ZIP, APPS, UNZIPPED, SENSITIVEAPI
+	#OUTPUT = "C:\\Users\\b\\Downloads\\test.txt"
+	#ZIP = "C:\\Users\\b\\Downloads\\7za920\\7za.exe"
+	#UNZIPPED = "C:\\Users\\b\\Downloads\\apps\\unzipped"
+	#APPS = "C:\\Users\\b\\Downloads\\apps"
+	#SENSITIVEAPI = "C:\\Users\\b\\Downloads\\sensitive_api.txt"
+	
 	of = open(OUTPUT, 'w')
 	of.write('')
 	of.close()
 	
-	for f in os.listdir(apps_dir):
+	for f in os.listdir(APPS):
 		if '.appx' in f:
-			app_folder = unzipped_apps_dir + "\\" + str(f)
+			app_folder = UNZIPPED + "\\" + str(f)
 			if not os.path.isdir(app_folder):
-				cmd = ZIP + ' x -o' + app_folder + ' -y ' + str(os.path.join(apps_dir, f))
+				cmd = ZIP + ' x -o' + app_folder + ' -y ' + str(os.path.join(APPS, f))
 				rc = subprocess.call(cmd, shell=True)
 				if rc:
 					print "unzipping failed"
 
-	for d in os.listdir(unzipped_apps_dir):
-		if os.path.isdir(os.path.join(unzipped_apps_dir, d)):
-			for f in os.listdir(os.path.join(unzipped_apps_dir, d)):
-				f_dir = os.path.join(unzipped_apps_dir, d)
+	api_list = getSensitiveApi()
+	print api_list
+	for d in os.listdir(UNZIPPED):
+		if os.path.isdir(os.path.join(UNZIPPED, d)):
+			for f in os.listdir(os.path.join(UNZIPPED, d)):
+				f_dir = os.path.join(UNZIPPED, d)
 				if f.endswith('exe'):
 					of = open(OUTPUT, 'a')
 					of.write("FILE: " + str(f_dir) + " " + str(f) + "\n")
@@ -97,15 +107,17 @@ def main():
 						findCallingUri(handler)
 						methods_called = list()
 						getMethodsCalled(handler, methods_called)
-						api_list = getSensitiveApi()
+						
 						for m in methods_called:
-							if m in api_list:
+							method_name = m.DeclaringType.FullName + "." + m.Name
+							
+							if method_name.lower() in api_list:
+								print "TRUE"
 								callsSensitiveApi = True
 								break
 							
 						if callsSensitiveApi:
-							dataFlow(handler, [], 0, dict()):
-						
+							dataFlow(handler, [], 0, dict())
 						
 
 def getSensitiveApi():
@@ -116,7 +128,7 @@ def getSensitiveApi():
 	api_list = list()
 	for api in apis:
 		if not api == "":
-			api_list.append(api.ToLower())
+			api_list.append(api.rstrip().lower())
 	return api_list
 						
 '''
@@ -125,7 +137,7 @@ def getSensitiveApi():
 def findCallingUri(method):
 	if method.Body:
 		for i in method.Body.Instructions:
-			if i.OpCode == Cil.Opcodes.Callvirt:
+			if i.OpCode == Cil.OpCodes.Callvirt:
 				if i.Operand.DeclaringType.FullName == "Windows.UI.Xaml.Controls.NotifyEventArgs"  and \
 					i.Operand.Name == "get_CallingUri":
 					of = open(OUTPUT, "a")
