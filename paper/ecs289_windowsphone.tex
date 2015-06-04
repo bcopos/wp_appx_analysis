@@ -55,7 +55,7 @@ Often, to extend the usability of such web-based applications, the developer may
 This is allowed but may create vulnerabilities in the application.
 For example, if the WebView has Javascript enabled and allows access to system resources, any Javascript on a website accessed by that WebView also has access to that sensitive information. 
 In this paper, we present an analysis tool which aims at detecting such vulnerabilities in Windows Phone 8.1 applications.
-In addition, we describe a Windows Phone store crawler which allowed us to gather 490 applications.
+In addition, we describe a Windows Phone store crawler which allowed us to gather 390 applications.
 The collected applications were used to test our analysis tool.
 
 \section{Background}
@@ -192,8 +192,8 @@ Our analysis is capable of detecting such cases by marking the object (the objec
 
 \section{Results}
 
-Unfortunately, despite gathering 490 applications, only 4 applications met our prerequisites.
-Out of the 490 applications, only 5 applications use a WebView component.
+Unfortunately, despite gathering 390 applications, only 4 applications met our prerequisites.
+Out of the 390 applications, only 5 applications use a WebView component.
 4 out of those 5 applications also implement a Javascript handler.
 3 of the 4 applications which have a Javascript handler are different versions of the same application.
 Our analysis also determined that these 3 applications call the \textit{ShowPhoneCallUI} method.
@@ -218,7 +218,7 @@ In the future, we would like to extend our framework to also search for such app
 Additionally, we would like to change our data flow analysis from intra-procedural to inter-procedural for more accurate analysis.
 
 \section{Conclusion}
-In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 490 applications. The results show that five applications use the WebView component. Out of the applications which include at least one WebView component, 80\% also use Javascript handlers.
+In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 390 applications. The results show that five applications use the WebView component. Out of the applications which include at least one WebView component, 80\% also use Javascript handlers.
 
 \section*{Acknowledgment}
 The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor Professor Matt Bishop.
