@@ -204,11 +204,11 @@ Although it could be more dangerous and detrimental if the handlers executed a s
 
 \section{Challenges}
 
-Applications :  Windows phone applications can be written in a number of languages such as C\#, Visual Basic, HTML and Javascript---which makes our analysis difficult. Also, since applications can be written directly in HTML and Javascript, such applications will not have a WebView component. Such applications limit the sample set we can test our framework in.
+\textbf{Applications} :  Windows phone applications can be written in a number of languages such as C\#, Visual Basic, HTML and Javascript---which makes our analysis difficult. Also, since applications can be written directly in HTML and Javascript, such applications will not have a WebView component, limiting the sample set we can test our framework in.
 
-Analysis tools : Windows Phone applications are written in C\#, compiled to an intermediate language and then packaged into the ``.appx" format. While the unpacking is easy, interpreting the intermediate language (MSIL/CIL) files is not easy. To perform the analysis, we must learn what every instructions opcode does and how it affects the stack. This process is tedious and a small mistake can skew our results.
+\textbf{Analysis tools} : Windows Phone applications are written in C\#, compiled to an intermediate language and then packaged into the ``.appx" format. While the unpacking is easy, interpreting the intermediate language (MSIL/CIL) files is not easy. To perform the analysis, we must learn what every instructions opcode does and how it affects the stack. This process is tedious and a small mistake can skew our results.
 
-Time : This course is only 16 weeks long. Because of such short time table, any unexpected difficulties can greatly impact the deliverables of this project.
+\textbf{Time} : This course is only 16 weeks long. Because of such short time table, any unexpected difficulties can greatly impact the deliverables of this project.
 
 \section{Future Work}
 
@@ -221,7 +221,7 @@ Additionally, we would like to change our data flow analysis from intra-procedur
 In this paper, we present we present a framework designed to analyze the security of Windows Phone applications which use the WebView component and implement Javascript handlers. Our tool is capable of detecting a few cases in which the Javascript can cause the application to display the phone call user interface (UI). Perhaps more alarmingly, the Javascript can control the number automatically inserted into the UI. We tested our tool on 390 applications. The results show that five applications use the WebView component. Out of the applications which include at least one WebView component, 80\% also use Javascript handlers.
 
 \section*{Acknowledgment}
-The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor Professor Matt Bishop.
+The authors would like to thank our sponsor, Yekaterina O'Neil, at Hewlett Packard, the organizers of the INSURE program and our mentor, Dr. Matt Bishop.
 
 \bibliographystyle{abbrv}
 \bibliography{ecs289_windowsphone}
